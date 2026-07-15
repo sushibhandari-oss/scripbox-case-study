@@ -1,0 +1,2165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scripbox x Parallel — Case study</title>
+<meta name="description" content="Sushma Bhandari — leading design for Scripbox, a wealth management platform.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Inter:wght@400;500&family=Marcellus&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAFAF7;
+    --ink:#141414;
+    --muted:#6E6E66;
+    --accent:#F58024;
+    --line:#DDDDD4;
+    --slide-transition:250ms;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-weight:400;
+    overflow:hidden;
+    height:100dvh;
+    width:100vw;
+  }
+  body.mobile-layout{overflow:auto;height:auto;}
+
+  h1,h2,h3{font-family:'Marcellus',serif;font-weight:400;letter-spacing:-0.46px;margin:0;}
+  .mono{font-family:'Spline Sans Mono',monospace;}
+
+  ::selection{background:var(--accent);color:#fff;}
+
+  /* ---------- deck shell ---------- */
+  #deck{position:relative;width:100vw;height:100dvh;}
+  body.mobile-layout #deck{height:auto;}
+
+  .slide{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    opacity:0;
+    transform:translateY(12px);
+    pointer-events:none;
+    transition:opacity var(--slide-transition) ease, transform var(--slide-transition) ease;
+    padding:8vh 8vw;
+  }
+  .slide.active{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+    z-index:2;
+  }
+  @media (prefers-reduced-motion:reduce){
+    .slide{transition:none;}
+  }
+
+  .eyebrow{
+    position:absolute;
+    top:6vh;
+    left:8vw;
+    font-size:0.8rem;
+    letter-spacing:0.04em;
+    color:var(--muted);
+  }
+
+  .headline{
+    font-size:clamp(1.9rem,3.6vw,3.4rem);
+    max-width:44rem;
+    line-height:1.15;
+  }
+  .headline.large{font-size:clamp(2.2rem,4.2vw,3.9rem);}
+
+  .rule{
+    width:100%;
+    max-width:34rem;
+    height:1px;
+    background:var(--line);
+    margin:1.75rem 0;
+    border:none;
+  }
+
+  .caption{
+    font-size:1.05rem;
+    line-height:1.55;
+    max-width:34rem;
+    color:var(--ink);
+  }
+  .caption em.muted, .muted-text{color:var(--muted);}
+
+  .slide-body{max-width:56rem;}
+
+  /* ---------- split layout: text left, visual right ---------- */
+  .slide-body.split{
+    max-width:none;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    gap:5vw;
+    flex:1;
+    min-height:0;
+    width:100%;
+  }
+  .split-text{flex:0 0 auto;width:36%;min-width:20rem;}
+  .split-visual{flex:1;min-width:0;height:100%;display:flex;align-items:center;justify-content:center;position:relative;}
+
+  /* ---------- placeholder media blocks ---------- */
+  .media{
+    position:relative;
+    border:1px solid var(--line);
+    background:var(--bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    overflow:hidden;
+    background-size:cover;
+    background-position:center;
+  }
+  .media .media-label{
+    font-size:0.72rem;
+    color:var(--muted);
+    line-height:1.5;
+    padding:0.5rem;
+  }
+  .media.loaded .media-label{display:none;}
+  .media.desat{filter:grayscale(0.55) contrast(0.95) brightness(0.98);}
+
+  /* ---------- chapter interstitial ---------- */
+  .interstitial{align-items:center;text-align:center;}
+  .interstitial .chapter-eyebrow{
+    font-size:0.85rem;
+    color:var(--muted);
+    letter-spacing:0.06em;
+    margin-bottom:1rem;
+  }
+  .interstitial h2{font-size:clamp(1.7rem,3.6vw,2.6rem);}
+
+  /* ---------- closing frame ---------- */
+  .closing-frame{align-items:center;text-align:center;}
+  .closing-frame a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent);}
+  .closing-frame .closing-sub{margin:1.5rem auto 0;color:var(--muted);}
+
+  /* ---------- keyboard hint ---------- */
+  #hint{
+    position:fixed;
+    bottom:9vh;
+    left:50%;
+    transform:translateX(-50%);
+    font-family:'Spline Sans Mono',monospace;
+    font-size:0.75rem;
+    color:var(--muted);
+    letter-spacing:0.02em;
+    opacity:1;
+    transition:opacity 500ms ease;
+    pointer-events:none;
+    z-index:20;
+  }
+  #hint.hidden{opacity:0;}
+
+  /* ---------- dot navigation ---------- */
+  #dotnav{
+    position:fixed;
+    bottom:4vh;
+    left:0;right:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:0.5rem;
+    z-index:30;
+  }
+  body.mobile-layout #dotnav{display:none;}
+  .dot-group{display:flex;align-items:center;gap:0.5rem;position:relative;}
+  .dot-group + .dot-group{margin-left:1.25rem;}
+  .dot-group-label{
+    position:absolute;
+    bottom:100%;
+    left:0;
+    margin-bottom:0.6rem;
+    font-family:'Spline Sans Mono',monospace;
+    font-size:0.65rem;
+    color:var(--muted);
+    white-space:nowrap;
+    opacity:0;
+    transition:opacity 150ms ease;
+    pointer-events:none;
+  }
+  .dot-group:hover .dot-group-label{opacity:1;}
+
+  .dot-wrap{position:relative;display:flex;align-items:center;justify-content:center;padding:0.5rem 0.15rem;cursor:pointer;}
+  .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--line);
+    transition:all 200ms ease;
+  }
+  .dot-wrap.current .dot{
+    width:20px;border-radius:4px;
+    background:var(--accent);
+  }
+  .dot-wrap:hover .dot{background:var(--ink);}
+  .dot-wrap.current:hover .dot{background:var(--accent);}
+
+  .thumb-preview{
+    position:absolute;
+    bottom:100%;
+    left:50%;
+    transform:translateX(-50%) translateY(-10px);
+    margin-bottom:0.5rem;
+    width:150px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    box-shadow:0 8px 24px rgba(20,20,20,0.12);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 150ms ease, transform 150ms ease;
+    z-index:40;
+  }
+  .dot-wrap:hover .thumb-preview{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+  .thumb-preview .media{width:100%;aspect-ratio:16/10;border:none;border-bottom:1px solid var(--line);}
+  .thumb-preview .thumb-caption{
+    font-size:0.62rem;
+    font-family:'Inter',sans-serif;
+    padding:0.4rem 0.5rem;
+    color:var(--ink);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  @media (hover:none){
+    .thumb-preview{display:none;}
+  }
+
+  /* ---------- contents button ---------- */
+  #contents-btn{
+    position:fixed;
+    bottom:4vh;
+    left:8vw;
+    font-family:'Spline Sans Mono',monospace;
+    font-size:0.78rem;
+    color:var(--ink);
+    background:none;
+    border:none;
+    cursor:pointer;
+    letter-spacing:0.02em;
+    z-index:30;
+    padding:0.5rem 0;
+  }
+  #contents-btn:hover{color:var(--accent);}
+
+  /* ---------- footer strip ---------- */
+  #footer-strip{
+    position:fixed;
+    bottom:4vh;
+    right:8vw;
+    text-align:right;
+    font-family:'Spline Sans Mono',monospace;
+    font-size:0.7rem;
+    color:var(--muted);
+    z-index:30;
+    line-height:1.5;
+  }
+  body.mobile-layout #footer-strip{display:none;}
+
+  /* ---------- bottom chrome: dot capsule + corner arrows ---------- */
+  #footer-strip,
+  #contents-btn{display:none;}
+  body.s3-active #hint{display:none;}
+
+  .dot-capsule{
+    display:flex;align-items:center;gap:0.5rem;
+    padding:0.5rem 1.15rem;
+    border-radius:999px;
+    background:rgba(250,250,247,0.72);
+    border:1px solid var(--line);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    box-shadow:0 6px 22px rgba(20,20,20,0.07);
+  }
+  .capsule-contents{
+    display:block;
+    font-family:'Spline Sans Mono',monospace;
+    font-size:0.72rem;
+    letter-spacing:0.02em;
+    color:var(--muted);
+    background:none;border:none;cursor:pointer;
+    padding:0;margin:0;
+    max-width:0;opacity:0;overflow:hidden;white-space:nowrap;
+    transition:max-width 260ms ease, opacity 200ms ease, margin 260ms ease;
+  }
+  .dot-capsule:hover .capsule-contents,
+  .capsule-contents:focus-visible{
+    max-width:6rem;
+    opacity:1;
+    margin-right:0.9rem;
+  }
+  .capsule-contents:hover{color:var(--accent);}
+
+  #nav-arrows{
+    display:flex;
+    gap:0.65rem;
+    position:fixed;
+    right:8vw;
+    bottom:4vh;
+    z-index:30;
+  }
+  body.mobile-layout #nav-arrows{display:none;}
+  .nav-arrow{
+    width:2.9rem;height:2.9rem;
+    border-radius:50%;
+    background:#fff;
+    border:none;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    color:var(--ink);
+    font-size:1.05rem;
+    box-shadow:0 10px 28px rgba(20,20,20,0.14);
+    transition:transform 200ms ease, box-shadow 200ms ease;
+  }
+  .nav-arrow:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(20,20,20,0.2);}
+
+  /* ---------- contents overlay ---------- */
+  #contents-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(250,250,247,0.97);
+    z-index:100;
+    display:none;
+    overflow-y:auto;
+    padding:10vh 8vw;
+  }
+  #contents-overlay.open{display:block;}
+  #contents-overlay .close-x{
+    position:fixed;
+    top:5vh;right:6vw;
+    font-family:'Spline Sans Mono',monospace;
+    font-size:1.4rem;
+    background:none;border:none;cursor:pointer;color:var(--ink);
+  }
+  #contents-overlay .close-x:hover{color:var(--accent);}
+  .toc-chapter{max-width:44rem;margin:0 auto 3.5rem auto;}
+  .toc-chapter h3{
+    font-size:1rem;
+    color:var(--muted);
+    letter-spacing:0.04em;
+    font-family:'Spline Sans Mono',monospace;
+    margin-bottom:1rem;
+    font-weight:500;
+  }
+  .toc-item{
+    display:flex;
+    gap:1.25rem;
+    padding:0.85rem 0;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    align-items:baseline;
+  }
+  .toc-item:hover .toc-headline{color:var(--accent);}
+  .toc-num{font-family:'Spline Sans Mono',monospace;color:var(--muted);font-size:0.85rem;flex-shrink:0;width:2rem;}
+  .toc-headline{font-family:'Archivo',sans-serif;font-weight:600;font-size:1.1rem;transition:color 150ms ease;}
+
+  /* ---------- Slide 1 ---------- */
+  .slide.s1 .split-text{width:47vw;min-width:0;}
+  .slide.s1 .headline{max-width:none;font-size:clamp(1.8rem,3.1vw,3.4rem);}
+  .stat-row{display:flex;gap:2.5rem;margin-top:4rem;}
+  .stat-col{flex:1;min-width:0;border-top:1px solid var(--line);padding-top:1.2rem;}
+  .stat-figure{
+    font-family:'Marcellus',serif;
+    font-weight:400;
+    letter-spacing:-0.46px;
+    font-size:clamp(1.7rem,2.4vw,2.4rem);
+    color:#F58024;
+    line-height:1;
+    white-space:nowrap;
+  }
+  .stat-label{
+    font-size:0.85rem;
+    color:var(--muted);
+    margin-top:0.7rem;
+  }
+  .s1-panel{
+    position:absolute;
+    top:0;right:0;bottom:0;left:68%;
+    background:#FDE6D6 url('assets/scripbox-app-home.png') center / 100% auto no-repeat;
+    z-index:1;
+  }
+
+  /* ---------- Slide 2: acquisition map ---------- */
+  .slide.s2 .split-text{width:41vw;min-width:0;}
+  .slide.s2 .headline{max-width:none;}
+  .caption-list{list-style:none;margin:0;padding:0;}
+  .caption-list li{position:relative;padding-left:1.4rem;margin-bottom:0.85rem;}
+  .caption-list li:last-child{margin-bottom:0;}
+  .caption-list li::before{
+    content:"";
+    position:absolute;
+    left:0;top:0.6em;
+    width:7px;height:7px;
+    border-radius:50%;
+    background:#F58024;
+  }
+  .acq-panel{
+    --s2-frame:min(39vw,624px);
+    position:absolute;
+    top:0;right:0;bottom:0;left:52%;
+    background:rgba(245,128,36,0.12);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:1.75rem;
+    padding:6vh 3vw 5vh;
+    z-index:1;
+  }
+  .acq-map-frame{
+    position:relative;
+    width:var(--s2-frame);
+    max-height:64vh;
+    aspect-ratio:1/1;
+  }
+  .acq-map{
+    width:100%;height:100%;
+    object-fit:contain;
+    display:block;
+  }
+  .acq-pin{
+    position:absolute;
+    left:var(--px);top:var(--py);
+    width:9px;height:9px;
+    margin:-4.5px 0 0 -4.5px;
+    border-radius:50%;
+    background:#F58024;
+    transition:opacity 300ms ease;
+    z-index:4;
+  }
+  .acq-pin::after{
+    content:"";
+    position:absolute;
+    inset:-6px;
+    border-radius:50%;
+    border:1px solid #F58024;
+    opacity:0.5;
+  }
+  .acq-pin.gone{opacity:0;}
+  .acq-callout{
+    position:absolute;
+    left:var(--px);top:var(--py);
+    padding:0.55rem 0.85rem;
+    background:#fff;
+    border-radius:8px;
+    box-shadow:0 8px 22px rgba(20,20,20,0.09);
+    font-size:0.72rem;
+    line-height:1.4;
+    white-space:nowrap;
+    transition:opacity 450ms ease 250ms, transform 750ms cubic-bezier(.4,.1,.2,1);
+    z-index:5;
+    pointer-events:none;
+  }
+  .acq-callout::before{
+    content:"";
+    position:absolute;
+    background:#B96A32;
+    opacity:0.6;
+  }
+  .acq-callout[data-anchor="top"]::before{top:100%;left:50%;width:1px;height:14px;}
+  .acq-callout[data-anchor="bottom"]::before{bottom:100%;left:50%;width:1px;height:14px;}
+  .acq-callout[data-anchor="left"]::before{left:100%;top:50%;width:14px;height:1px;}
+  .acq-callout[data-anchor="right"]::before{right:100%;top:50%;width:14px;height:1px;}
+  .acq-callout .a-name{font-family:'Archivo',sans-serif;font-weight:700;font-size:0.82rem;}
+  .acq-callout .a-city{color:var(--muted);font-size:0.68rem;letter-spacing:0.03em;}
+  .acq-callout[data-anchor="top"]{transform:translate(-50%,calc(-100% - 14px));}
+  .acq-callout[data-anchor="bottom"]{transform:translate(-50%,14px);}
+  .acq-callout[data-anchor="left"]{transform:translate(calc(-100% - 14px),-50%);}
+  .acq-callout[data-anchor="right"]{transform:translate(14px,-50%);}
+  .acq-callout.flying{opacity:0;}
+  @media (prefers-reduced-motion:reduce){
+    .acq-callout{transition:none;}
+    .acq-pin{transition:none;}
+  }
+  .acq-logo{
+    width:min(13vw,160px);height:auto;
+    position:relative;
+    left:calc(var(--s2-frame) * -0.156);
+    transition:transform 250ms ease;
+  }
+  .acq-logo.pulse{transform:scale(1.1);}
+
+  /* ---------- Slide 3 ---------- */
+  .scope-line{font-family:'Spline Sans Mono',monospace;font-size:1rem;margin-top:2rem;}
+  .scope-line span{margin-right:0.5rem;}
+  .strike-wrap{position:relative;display:inline-block;color:var(--muted);}
+  .strike-wrap::after{
+    content:"";
+    position:absolute;
+    left:0;top:50%;
+    width:0%;
+    height:1px;
+    background:var(--muted);
+    transition:width 400ms ease 400ms;
+  }
+  .strike-wrap.struck::after{width:100%;}
+  @media (prefers-reduced-motion:reduce){
+    .strike-wrap::after{transition:none;}
+  }
+
+  .slide.s3{justify-content:flex-start;padding-top:16vh;}
+  .slide.s3 .slide-body{max-width:none;width:100%;}
+  .s3-headline{max-width:none;width:75%;}
+
+  .fan-bottom{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:1;
+  }
+  .fan-card{
+    position:absolute;
+    left:var(--fx);
+    bottom:var(--fb);
+    width:42vw;
+    border-radius:10px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    background:var(--bg);
+    box-shadow:0 18px 50px rgba(20,20,20,0.16);
+    z-index:var(--fz);
+    transform:rotate(var(--fr));
+    transform-origin:50% 100%;
+    transition:transform 380ms cubic-bezier(.2,.8,.2,1), box-shadow 380ms ease;
+    cursor:pointer;
+    pointer-events:auto;
+  }
+  .fan-card img{width:100%;height:auto;display:block;}
+  .fan-card:hover{
+    transform:rotate(0deg) translateY(-5.5rem) scale(1.06);
+    z-index:25;
+    box-shadow:0 30px 70px rgba(20,20,20,0.26);
+  }
+  @media (prefers-reduced-motion:reduce){
+    .fan-card{transition:none;}
+  }
+
+  /* ---------- Slide 4a ---------- */
+  .slide.s4a .slide-body{max-width:none;width:100%;}
+  .slide.s4a .headline{max-width:none;width:75%;}
+
+  /* ---------- Slide 4b: guided report reveal ---------- */
+  .slide.s4b .split-text{width:27vw;min-width:0;}
+  .report-panel{
+    position:absolute;
+    top:0;right:0;bottom:0;left:35%;
+    background:rgba(245,128,36,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:7vh 3vw;
+    z-index:1;
+  }
+  .report-screens{
+    position:relative;
+    width:min(54vw,1040px);
+    max-width:100%;
+    aspect-ratio:16/9;
+  }
+  .report-screens .media{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:opacity 300ms ease;
+  }
+  .report-screens .media.show{opacity:1;}
+  @media (prefers-reduced-motion:reduce){
+    .report-screens .media{transition:none;}
+  }
+  .s4b-h{
+    font-size:clamp(1.5rem,2.2vw,2.2rem);
+    margin-bottom:3rem;
+  }
+  .reveal-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .reveal-list li{
+    position:relative;
+    padding-left:2.4rem;
+    padding-bottom:2.4rem;
+    font-size:clamp(1rem,1.25vw,1.2rem);
+    font-weight:500;
+    line-height:1.3;
+    letter-spacing:-0.015em;
+    color:var(--ink);
+    opacity:0;
+    transition:opacity 450ms ease 350ms;
+  }
+  .reveal-list li.shown{opacity:1;}
+  .reveal-list li:first-child{transition-delay:0ms;}
+  .reveal-list li:last-child{padding-bottom:0;}
+  .reveal-list .rl-t{display:block;}
+  .reveal-list .rl-d{
+    display:block;
+    font-size:0.88rem;
+    font-weight:400;
+    line-height:1.5;
+    letter-spacing:0;
+    color:var(--muted);
+    margin-top:0.45rem;
+    max-width:38ch;
+  }
+  .reveal-list li::before{
+    content:"";
+    position:absolute;
+    left:0;top:0.22em;
+    width:14px;height:14px;
+    border-radius:50%;
+    background:#F58024;
+  }
+  .reveal-list li::after{
+    content:"";
+    position:absolute;
+    left:6px;
+    top:calc(0.22em + 20px);
+    bottom:8px;
+    width:2px;
+    background:var(--line);
+    transform:scaleY(0);
+    transform-origin:top center;
+    transition:transform 400ms ease;
+  }
+  .reveal-list li:last-child::after{display:none;}
+  .reveal-list li.line-on::after{transform:scaleY(1);}
+  .reveal-more{
+    display:inline-block;
+    margin:2.2rem 0 0 2.4rem;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:0.38rem 0.95rem;
+    font-size:0.72rem;
+    letter-spacing:0.02em;
+    color:var(--muted);
+    opacity:0;
+    transform:translateY(4px);
+    transition:opacity 450ms ease 650ms, transform 450ms ease 650ms;
+  }
+  .reveal-more.shown{opacity:1;transform:none;}
+  @media (prefers-reduced-motion:reduce){
+    .reveal-list li,
+    .reveal-list li::after{transition:none;}
+  }
+
+  /* ---------- Slide 5b hero ---------- */
+  .browser-frame{
+    background:var(--bg);
+    border:1px solid var(--line);
+    box-shadow:0 20px 50px rgba(20,20,20,0.08);
+  }
+  .browser-bar{
+    display:flex;align-items:center;gap:5px;
+    padding:0.5rem 0.7rem;
+    border-bottom:1px solid var(--line);
+  }
+  .browser-bar .b-dot{width:6px;height:6px;border-radius:50%;background:var(--line);}
+  .browser-bar .b-field{
+    flex:1;height:14px;margin-left:0.5rem;background:var(--bg);border:1px solid var(--line);border-radius:2px;
+  }
+
+  /* ---------- Slide 6: problem cards ---------- */
+  .slide.s6 .slide-body, .slide.ssum .slide-body{max-width:none;width:100%;}
+  .slide.ssum .problem-copy{margin-top:1.25rem;}
+  .problem-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1.5rem;
+    margin-top:3.5rem;
+    max-width:72vw;
+  }
+  .problem-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:1.2rem 1.3rem 1.4rem;
+  }
+  .problem-tag{
+    font-size:0.68rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    padding-bottom:0.9rem;
+    border-bottom:1px solid var(--line);
+  }
+  .problem-title{
+    font-weight:600;
+    font-size:1.15rem;
+    letter-spacing:-0.01em;
+    margin-top:1.25rem;
+  }
+  .problem-copy{
+    font-size:0.95rem;
+    line-height:1.55;
+    color:var(--muted);
+    margin:0.5rem 0 0;
+  }
+
+  /* ---------- Slide 7: bring-over sort ---------- */
+  .slide.ssort .slide-body{max-width:none;width:100%;display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;}
+  .sort-head{position:relative;height:6rem;flex:none;}
+  .sort-head .hswap{
+    position:absolute;top:0;left:0;right:0;
+    opacity:0;transform:translateY(14px);
+    transition:opacity 450ms ease, transform 450ms ease;
+  }
+  .sort-head .hswap.show{opacity:1;transform:none;}
+  .sort-h{font-size:clamp(1.4rem,2vw,2rem);max-width:none;}
+  #sort-grid{position:relative;height:50vh;margin-top:3vh;flex:none;}
+  .sc-card{
+    position:absolute;top:0;left:0;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:0.75rem 1rem;
+    display:flex;flex-direction:column;justify-content:space-between;
+    box-shadow:0 10px 26px -14px rgba(20,20,20,0.12);
+    opacity:0;
+    transform:var(--pos,translate(0px,0px)) translateY(46px) scale(0.94);
+    transition:transform 850ms cubic-bezier(.2,.8,.2,1), width 850ms cubic-bezier(.2,.8,.2,1), height 850ms cubic-bezier(.2,.8,.2,1), opacity 550ms ease, border-color 300ms ease, background 300ms ease;
+  }
+  .sc-name{font-weight:600;font-size:clamp(0.82rem,1vw,1rem);letter-spacing:-0.01em;line-height:1.3;}
+  .sc-verd{
+    display:inline-flex;align-items:center;gap:0.45rem;
+    font-family:'Spline Sans Mono',monospace;
+    font-size:0.68rem;font-weight:500;
+    opacity:0;transform:translateY(4px);
+    transition:opacity 300ms ease, transform 350ms ease;
+  }
+  .sc-verd .dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none;}
+  .sc-verd.v-keep{color:#0E8A60;}
+  .sc-verd.v-up{color:#B07C1E;}
+  .sc-verd.v-out{color:#C25454;}
+  .ssort.b0 .sc-card,.ssort.b1 .sc-card,.ssort.b2 .sc-card,.ssort.b3 .sc-card,.ssort.b4 .sc-card{opacity:1;transform:var(--pos,translate(0px,0px));}
+  .ssort.b1 .sc-verd{opacity:1;transform:translateY(0);}
+  .ssort.b1 .sc-card.c-keep{border-color:rgba(14,138,96,0.3);background:#F4FAF7;}
+  .ssort.b1 .sc-card.c-up{border-color:rgba(176,124,30,0.28);background:#FBF7EF;}
+  .ssort.b1 .sc-card.c-out{border-color:rgba(194,84,84,0.26);background:#FBF3F2;}
+  .ssort.b2 .sc-card.c-out,.ssort.b3 .sc-card.c-out,.ssort.b4 .sc-card.c-out,
+  .ssort.b2 .sc-card.c-up,.ssort.b3 .sc-card.c-up,.ssort.b4 .sc-card.c-up{
+    opacity:0;
+    transform:var(--pos,translate(0px,0px)) translateY(60vh) rotate(var(--fall,5deg));
+    transition:transform 1100ms cubic-bezier(.5,0,.8,.4), opacity 900ms ease 250ms;
+    pointer-events:none;
+  }
+  .sort-group-label{
+    position:absolute;top:0;
+    font-family:'Spline Sans Mono',monospace;
+    font-size:0.7rem;font-weight:500;
+    letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--muted);
+    opacity:0;transform:translateY(8px);
+    transition:opacity 500ms ease 450ms, transform 500ms ease 450ms;
+  }
+  .ssort.b4 .sort-group-label{opacity:1;transform:none;}
+  @media (prefers-reduced-motion:reduce){
+    .sc-card,.sc-verd,.sort-head .hswap,.sort-group-label{transition:none;}
+  }
+
+  /* ---------- Slide 8: information architecture ---------- */
+  .slide.snav .slide-body{max-width:none;width:100%;position:relative;display:flex;flex-direction:row;align-items:stretch;gap:3vw;flex:1;min-height:0;}
+  .nav-left{width:30%;min-width:19rem;flex:none;display:flex;flex-direction:column;justify-content:center;}
+  .nav-head{height:9rem;}
+  .nav-callout-col{display:grid;margin-top:1.25rem;}
+  .nav-callouts{
+    grid-area:1/1;
+    display:flex;flex-direction:column;gap:1rem;
+    opacity:0;transform:translateY(10px);
+    transition:opacity 450ms ease, transform 450ms ease;
+    pointer-events:none;
+  }
+  .nav-callouts.show{opacity:1;transform:none;pointer-events:auto;}
+  .nav-callout{
+    border:1px solid var(--line);background:#fff;border-radius:10px;padding:0.85rem 1rem;
+    opacity:0.35;
+    transition:opacity 300ms ease, border-color 300ms ease;
+  }
+  .nav-callout.active{opacity:1;border-color:var(--accent);}
+  .nav-callout .n-num{font-family:'Spline Sans Mono',monospace;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--accent);}
+  .nav-callout p{margin:0.35rem 0 0;font-size:0.85rem;line-height:1.45;}
+  .ia-panel{
+    position:absolute;
+    top:0;right:0;bottom:0;left:35%;
+    background:#FDE6D6;
+    z-index:1;
+  }
+  .slide.snav .slide-body{position:relative;z-index:2;}
+  .nav-right{
+    flex:1;min-width:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .nav-frame{flex:none;display:flex;flex-direction:column;max-width:100%;}
+  .nav-screens{position:relative;height:50vh;aspect-ratio:1512/1024;max-width:100%;}
+  .nav-media{position:absolute;inset:0;opacity:0;transition:opacity 500ms ease;}
+  .nav-media.show{opacity:1;}
+  #nav-media-new{background-position:left center;}
+  #ia-arrows{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+  #ia-arrows path.nav-line{stroke:var(--accent);stroke-width:1.5;fill:none;opacity:0;transition:opacity 350ms ease;}
+  #ia-arrows path.nav-line.show{opacity:1;}
+  #ia-arrowhead path{fill:var(--accent);stroke:none;}
+  @media (prefers-reduced-motion:reduce){
+    .nav-callouts,.nav-callout,.nav-media,#ia-arrows path.nav-line{transition:none;}
+  }
+
+  /* ---------- Slide 6 compare ---------- */
+  .compare-row{display:flex;flex-direction:row;gap:1.25rem;width:100%;align-items:flex-start;}
+  .compare-col{flex:1;min-width:0;}
+  .compare-col .media{width:100%;aspect-ratio:16/10;margin-bottom:0.6rem;}
+  .compare-label{font-family:'Spline Sans Mono',monospace;font-size:0.75rem;color:var(--muted);}
+
+  /* ---------- Slide 7: portal unify diagram ---------- */
+  .slide.s10u .slide-body{max-width:none;width:100%;}
+  .slide.s10u .headline{max-width:none;}
+  .unify-stage{
+    position:relative;
+    width:40rem;
+    height:11.5rem;
+    margin:4.5rem auto 0;
+  }
+  .unify-platform{
+    position:absolute;
+    top:0;
+    width:18rem;
+    height:3.4rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Archivo',sans-serif;
+    font-weight:600;
+    font-size:0.95rem;
+    border:1px solid var(--ink);
+    background:var(--bg);
+    transition:transform 550ms cubic-bezier(0.22,1,0.36,1), opacity 350ms ease;
+  }
+  .unify-platform.portal{left:0;}
+  .unify-platform.legacy{left:22rem;border-color:var(--line);}
+  .unify-card{
+    position:absolute;
+    top:4.4rem;
+    width:18rem;
+    height:3rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0.6rem;
+    font-family:'Spline Sans Mono',monospace;
+    font-size:0.85rem;
+    border:1px solid var(--line);
+    background:var(--bg);
+    transition:transform 550ms cubic-bezier(0.22,1,0.36,1) 120ms;
+  }
+  .unify-card .uc-icon{color:var(--muted);flex:0 0 auto;}
+  .unify-card.assisted{left:0;}
+  .unify-card.selfserve{left:22rem;}
+  .unify-prefix{
+    display:inline-block;
+    max-width:0;
+    opacity:0;
+    overflow:hidden;
+    white-space:nowrap;
+    color:var(--accent);
+    transition:max-width 350ms ease 550ms, opacity 350ms ease 600ms;
+  }
+  .unify-stage.merged .unify-platform.portal{transform:translateX(11rem);}
+  .unify-stage.merged .unify-platform.legacy{opacity:0;transform:translateY(-10px);}
+  .unify-stage.merged .unify-card.assisted{transform:translateX(11rem);}
+  .unify-stage.merged .unify-card.selfserve{transform:translate(-11rem,3.8rem);}
+  .unify-stage.merged .unify-prefix{max-width:5rem;opacity:1;}
+
+  /* ---------- Slide 8 card sort ---------- */
+  .slide.s11gap .split-text{width:40vw;min-width:0;}
+  .slide.s11gap .headline{max-width:none;}
+  .gap-panel{
+    position:absolute;
+    top:0;right:0;bottom:0;left:55%;
+    background:#FDE6D6;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:6vh 3vw;
+    z-index:1;
+  }
+  .ledger{
+    width:min(24rem,100%);
+    background:var(--bg);
+    border-radius:18px;
+    padding:1.9rem 1.8rem 1.4rem;
+    box-shadow:0 18px 44px rgba(20,20,20,0.08);
+    font-size:0.95rem;
+  }
+  .ledger-title{
+    font-family:'Marcellus',serif;
+    font-size:1.3rem;
+    letter-spacing:-0.46px;
+    padding-bottom:1.1rem;
+    border-bottom:1px solid var(--line);
+  }
+  .ledger-row{
+    display:flex;
+    align-items:center;
+    gap:1.1rem;
+    padding:0.95rem 0;
+    border-bottom:1px solid var(--line);
+  }
+  .ledger-row:last-child{border-bottom:none;}
+  .li-badge{
+    width:30px;height:30px;
+    flex:0 0 auto;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .ledger-row.can .li-badge{background:rgba(245,128,36,0.16);color:var(--accent);}
+  .ledger-row.cant .li-badge{border:1.5px solid var(--line);}
+
+  /* ---------- Slide 9: imbalance table ---------- */
+  .s9-body{max-width:none;width:100%;}
+  .s9-headline{max-width:none;font-size:clamp(1.3rem,1.9vw,1.75rem);margin:0;}
+  .s9-caption{max-width:none;color:var(--muted);font-size:0.95rem;margin:0.75rem 0 0;}
+  .imbalance-table{
+    display:grid;
+    grid-template-columns:minmax(7rem,auto) 1fr 1fr;
+    max-width:44rem;
+    border:1px solid var(--line);
+    font-size:0.8rem;
+    line-height:1.5;
+    margin:3rem 0 0;
+  }
+  .it-cell{padding:0.9rem 1.25rem;border-top:1px solid var(--line);}
+  .it-cell:nth-child(-n+3){border-top:none;}
+  .it-label{color:var(--muted);}
+  .it-head{font-weight:600;}
+  .imbalance-takeaway{
+    font-family:'Marcellus',serif;
+    font-size:clamp(1.6rem,2.9vw,2.5rem);
+    line-height:1.3;
+    letter-spacing:-0.46px;
+    max-width:56rem;
+    margin:3.25rem 0 0;
+  }
+  .imbalance-takeaway .accent-num{color:var(--accent);}
+
+  /* ---------- Slide 9: invest flow annotations ---------- */
+  .slide.s12inv{justify-content:flex-start;padding-top:12vh;}
+  .slide.s12inv .slide-body.split{align-items:stretch;}
+  .slide.s12inv .split-text{width:34vw;min-width:22rem;padding-top:3vh;}
+  .slide.s12inv .reveal-list li{padding-bottom:2.1rem;}
+  .slide.s12inv .rl-d{max-height:0;opacity:0;overflow:hidden;margin-top:0;transition:max-height 350ms ease, opacity 300ms ease 100ms, margin-top 350ms ease;}
+  .slide.s12inv .reveal-list li.open .rl-d{max-height:8rem;opacity:1;margin-top:0.45rem;}
+  .slide.s12inv .headline{max-width:none;font-size:clamp(1.5rem,2.2vw,2.2rem);margin-bottom:0.9rem;}
+  .s12-sub{font-size:0.95rem;color:var(--muted);margin:0 0 2.6rem;}
+  .s12-screen-wrap{position:relative;}
+  #s12-screen{width:100%;aspect-ratio:2048/1622;}
+  #s13-screen{width:100%;aspect-ratio:2419/1562;}
+  #s12-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+  .s12-line{stroke:var(--accent);stroke-width:1.5;fill:none;opacity:0;transition:opacity 250ms ease;}
+  .s12-line.show{opacity:1;}
+  #s12-arrowhead path{fill:var(--accent);stroke:none;}
+  .slide.s12inv .browser-frame{max-width:min(100%,64vh * 1.263);margin:0 auto;}
+  .slide.s13new .browser-frame{max-width:min(100%,60vh * 1.549);}
+  .slide.s13new .reveal-list{margin-top:2.4rem;}
+  .slide.s13new .rl-d{max-width:none;}
+
+  /* ---------- annotated screen zone (slides 12 & 13) ---------- */
+  .annotate-screen-zone{width:100%;position:relative;display:flex;align-items:center;justify-content:center;}
+
+  /* ---------- Mobile layout ---------- */
+  @media (max-width:768px), (hover:none) and (pointer:coarse){
+    body.mobile-layout{overflow-y:auto;}
+    body.mobile-layout #deck{position:static;height:auto;}
+    body.mobile-layout .slide{
+      position:static;
+      opacity:1;
+      transform:none;
+      pointer-events:auto;
+      height:auto;
+      min-height:auto;
+      padding:4rem 6vw;
+      border-bottom:1px solid var(--line);
+      display:flex;
+    }
+    body.mobile-layout .slide.active{z-index:auto;}
+    body.mobile-layout .eyebrow{position:static;margin-bottom:2rem;display:block;}
+    body.mobile-layout #hint{display:none;}
+    body.mobile-layout #s2-stage{min-height:340px;}
+    body.mobile-layout .hero-screens,
+    body.mobile-layout .compare-row,
+    body.mobile-layout .slide-body.split{flex-direction:column;}
+    body.mobile-layout .annotate-screen-zone,
+    body.mobile-layout .hero-screens .media,
+    body.mobile-layout .compare-col,
+    body.mobile-layout .split-text,
+    body.mobile-layout .split-visual{width:100%;min-width:0;}
+    body.mobile-layout .split-visual{margin-top:2rem;}
+    body.mobile-layout .hero-screens .side{display:none;}
+    body.mobile-layout #s12-svg{display:none;}
+    body.mobile-layout .reveal-list li{opacity:1;}
+    body.mobile-layout .slide.s12inv .rl-d{max-height:none;opacity:1;margin-top:0.45rem;}
+    body.mobile-layout .imbalance-table{font-size:0.72rem;}
+    body.mobile-layout .it-cell{padding:0.7rem 0.6rem;}
+    body.mobile-layout .unify-stage{width:100%;height:auto;margin-top:2.5rem;display:flex;flex-direction:column;gap:0.75rem;}
+    body.mobile-layout .unify-stage>*{position:static;width:100%;transform:none !important;transition:none;}
+    body.mobile-layout .unify-platform.legacy{display:none;}
+    body.mobile-layout .unify-prefix{max-width:none;opacity:1;}
+    body.mobile-layout .gap-panel{position:static;margin-top:2rem;padding:2rem 1.25rem;}
+  }
+
+  /* desktop + prefers-reduced-motion: static fallback for slides 12 & 13 */
+  body.reduced-motion #s12-svg{display:none;}
+</style>
+</head>
+<body>
+
+<div id="deck">
+
+  <!-- CHAPTER 1 INTERSTITIAL -->
+  <section class="slide interstitial" data-type="interstitial" data-chapter="1">
+    <div class="chapter-eyebrow mono">Scripbox × Parallel</div>
+    <h2>Chapter 01 · The brief</h2>
+  </section>
+
+  <!-- Slide 1 -->
+  <section class="slide s1" data-type="content" data-dot="1" data-chapter="1" data-chapter-title="The brief"
+            data-headline="Scripbox is one of India's largest wealth management platforms.">
+    <div class="eyebrow mono">01 · The brief</div>
+    <div class="slide-body split">
+      <div class="split-text">
+        <h1 class="headline">Scripbox is one of India's<br>largest wealth management<br>platforms.</h1>
+        <div class="stat-row">
+          <div class="stat-col">
+            <div class="stat-figure" id="s1-counter">₹0 Cr+</div>
+            <div class="stat-label">Assets under management</div>
+          </div>
+          <div class="stat-col">
+            <div class="stat-figure">1 lakh+</div>
+            <div class="stat-label">Families</div>
+          </div>
+          <div class="stat-col">
+            <div class="stat-figure">2,500+</div>
+            <div class="stat-label">Cities</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="s1-panel" role="img" aria-label="Scripbox app home screen on a phone"></div>
+  </section>
+
+  <!-- Slide 2 -->
+  <section class="slide s2" data-type="content" data-dot="2" data-chapter="1" data-chapter-title="The brief" data-advance-stages="1"
+            data-headline="Scripbox grew by acquiring wealth management firms across India.">
+    <div class="eyebrow mono">02 · The brief</div>
+    <div class="slide-body split">
+      <div class="split-text">
+        <h1 class="headline">Scripbox grew by acquiring wealth management firms across India.</h1>
+        <hr class="rule">
+        <ul class="caption caption-list">
+          <li>Each firm ran its own systems</li>
+          <li>Each RM worked differently with clients</li>
+          <li>No unified product for all acquired clients</li>
+        </ul>
+      </div>
+    </div>
+    <div class="acq-panel" id="s2-visual">
+      <div class="acq-map-frame" id="s2-map-frame">
+        <img class="acq-map" id="s2-map" src="assets/india-map.svg" alt="Map of India">
+      </div>
+      <img class="acq-logo" id="s2-logo" src="assets/logo orange.png" alt="Scripbox">
+    </div>
+  </section>
+
+  <!-- Slide 3 -->
+  <section class="slide s3" data-type="content" data-dot="3" data-chapter="1" data-chapter-title="The brief"
+            data-headline="The client portal became the one platform all assisted clients would use.">
+    <div class="eyebrow mono">03 · The brief</div>
+    <div class="slide-body">
+      <h1 class="headline s3-headline">The client portal became the one platform all assisted clients would use.</h1>
+      <div class="scope-line mono">
+        <span>Reporting</span>·<span>Portfolio viewing</span>·<span id="s3-strike" class="strike-wrap">Transactions</span>
+      </div>
+    </div>
+    <div class="fan-bottom">
+      <div class="fan-card" style="--fx:-7vw;--fb:-11vh;--fr:-2deg;--fz:1;">
+        <img src="assets/page 3 CP/financial plan.png" alt="Financial planning screen">
+      </div>
+      <div class="fan-card" style="--fx:14vw;--fb:-15vh;--fr:1.4deg;--fz:2;">
+        <img src="assets/page 3 CP/transaction list.png" alt="Transaction list screen">
+      </div>
+      <div class="fan-card" style="--fx:35vw;--fb:-10vh;--fr:-1deg;--fz:3;">
+        <img src="assets/page 3 CP/products page.png" alt="Products screen">
+      </div>
+      <div class="fan-card" style="--fx:56vw;--fb:-16vh;--fr:1.8deg;--fz:4;">
+        <img src="assets/page 3 CP/transactions.png" alt="Transactions screen">
+      </div>
+      <div class="fan-card" style="--fx:72vw;--fb:-12vh;--fr:-1.2deg;--fz:5;">
+        <img src="assets/page 3 CP/1605.png" alt="Portal dashboard screen">
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAPTER 2 INTERSTITIAL -->
+  <section class="slide interstitial" data-type="interstitial" data-chapter="2">
+    <div class="chapter-eyebrow mono">Scripbox × Parallel</div>
+    <h2>Chapter 02 · The report</h2>
+  </section>
+
+  <!-- Slide 4a -->
+  <section class="slide s4a" data-type="content" data-dot="4" data-chapter="2" data-chapter-title="The report"
+            data-headline="Every month, an RM would get on a call with the assisted clients and help them understand their portfolio through a PDF performance report.">
+    <div class="eyebrow mono">04 · The report</div>
+    <div class="slide-body">
+      <h1 class="headline large">Every month, an RM would get on a call with the assisted clients and help them understand their portfolio through a PDF performance report.</h1>
+    </div>
+  </section>
+
+  <!-- Slide 4b -->
+  <section class="slide s4b" data-type="content" data-dot="5" data-chapter="2" data-chapter-title="The report" data-advance-stages="4"
+            data-headline="The portfolio report contains">
+    <div class="eyebrow mono">05 · The report</div>
+    <div class="slide-body split">
+      <div class="split-text">
+        <h1 class="headline s4b-h">The portfolio report contains</h1>
+        <ol class="reveal-list" id="s4b-list">
+          <li class="shown">
+            <span class="rl-t">Overall wealth</span>
+            <span class="rl-d">A single view of everything the client owned across mutual funds, PMS, bonds, and stocks.</span>
+          </li>
+          <li>
+            <span class="rl-t">Long-term growth</span>
+            <span class="rl-d">How the portfolio's value moved over eight years.</span>
+          </li>
+          <li>
+            <span class="rl-t">Downside protection</span>
+            <span class="rl-d">How the portfolio held up against the index during a market downturn.</span>
+          </li>
+          <li>
+            <span class="rl-t">Benchmarking</span>
+            <span class="rl-d">How the equity portfolio performed relative to the index.</span>
+          </li>
+          <li>
+            <span class="rl-t">Rebalancing</span>
+            <span class="rl-d">A recommended set of changes to reduce fund overlap and simplify the portfolio.</span>
+          </li>
+        </ol>
+        <div class="reveal-more mono" id="s4b-more">+ and many more</div>
+      </div>
+    </div>
+    <div class="report-panel">
+      <div class="report-screens" id="s4b-screens">
+        <div class="media show" data-src="assets/report screens/overall wealth.png" data-label="overall wealth.png"></div>
+        <div class="media" data-src="assets/report screens/long term growth.png" data-label="long term growth.png"></div>
+        <div class="media" data-src="assets/report screens/downside protection.png" data-label="downside protection.png"></div>
+        <div class="media" data-src="assets/report screens/index banchmarking.png" data-label="index banchmarking.png"></div>
+        <div class="media" data-src="assets/report screens/rebalancing.png" data-label="rebalancing.png"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 5a -->
+  <section class="slide s6" data-type="content" data-dot="6" data-chapter="2" data-chapter-title="The report"
+            data-headline="But none of it lived in the Client Portal.">
+    <div class="eyebrow mono">06 · The report</div>
+    <div class="slide-body">
+      <h1 class="headline large">But none of it lived in the Client Portal.</h1>
+      <div class="problem-row">
+        <div class="problem-card">
+          <div class="problem-tag mono">Problem 1</div>
+          <div class="problem-title">Gated by an RM</div>
+          <p class="problem-copy">No access without an RM. Performance data lived with someone else, to see it, you had to ask.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-tag mono">Problem 2</div>
+          <div class="problem-title">Static reporting</div>
+          <p class="problem-copy">Updated once a month. Whatever changed in between was invisible until the next report.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-tag mono">Problem 3</div>
+          <div class="problem-title">No room to explore</div>
+          <p class="problem-copy">Just a page. Nothing to click, filter, or dig into.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 7: what to bring over -->
+  <section class="slide ssort" id="slide-sort" data-type="content" data-dot="7" data-chapter="2" data-chapter-title="The report" data-advance-stages="4"
+            data-headline="What should make it to the Client Portal?">
+    <div class="eyebrow mono">07 · The report</div>
+    <div class="slide-body sort-body">
+      <div class="sort-head">
+        <div class="hswap show"><h1 class="headline sort-h">What should make it to the Client Portal?</h1></div>
+        <div class="hswap"><h1 class="headline sort-h">With the help of the RMs, we narrowed down on what to keep and what wasn't required on the platform.</h1></div>
+        <div class="hswap"><h1 class="headline sort-h">The next challenge was deciding how to organise different types of reporting.</h1></div>
+      </div>
+      <div id="sort-grid"></div>
+    </div>
+  </section>
+
+  <!-- Slide 8: information architecture -->
+  <section class="slide snav" id="slide-nav" data-type="content" data-dot="8" data-chapter="2" data-chapter-title="The report" data-advance-stages="5"
+            data-headline="Our existing navigation wasn't built for this level of complexity.">
+    <div class="eyebrow mono">08 · Information architecture</div>
+    <div class="ia-panel"></div>
+    <div class="slide-body nav-body" id="nav-body">
+      <div class="nav-left">
+        <div class="sort-head nav-head">
+          <div class="hswap show"><h1 class="headline sort-h">Our existing navigation wasn't built for this level of complexity.</h1></div>
+          <div class="hswap"><h1 class="headline sort-h">We designed a navigation system that could grow with the product.</h1></div>
+        </div>
+        <div class="nav-callout-col">
+          <div class="nav-callouts show" id="nav-callouts-old">
+            <div class="nav-callout"><div class="n-num mono">Problem 1</div><p>Products competed for space in the top navigation.</p></div>
+            <div class="nav-callout"><div class="n-num mono">Problem 2</div><p>Every Mutual Fund insight lived on one scrolling page.</p></div>
+            <div class="nav-callout"><div class="n-num mono">Problem 3</div><p>New reporting meant adding more content, not improving structure.</p></div>
+          </div>
+          <div class="nav-callouts" id="nav-callouts-new">
+            <div class="nav-callout"><div class="n-num mono">Solution 1</div><p>Product navigation moved to the sidebar.</p></div>
+            <div class="nav-callout"><div class="n-num mono">Solution 2</div><p>Nested tabs grouped information by purpose.</p></div>
+            <div class="nav-callout"><div class="n-num mono">Solution 3</div><p>Reporting became modular, discoverable and easier to scale.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-right" id="nav-right">
+        <div class="nav-frame browser-frame" id="nav-frame">
+          <div class="browser-bar"><span class="b-dot"></span><span class="b-dot"></span><span class="b-dot"></span><div class="b-field"></div></div>
+          <div class="nav-screens" id="nav-screens">
+            <div class="media nav-media show" id="nav-media-old" data-src="assets/old navigation.png" data-label="old navigation.png — Old product navigation"></div>
+            <div class="media nav-media" id="nav-media-new" data-src="assets/new navigation.gif" data-label="new navigation.gif — New navigation system"></div>
+          </div>
+        </div>
+      </div>
+      <svg id="ia-arrows" aria-hidden="true">
+        <defs>
+          <marker id="ia-arrowhead" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
+            <path d="M0,0 L7,3.5 L0,7 Z"></path>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Slide 6 -->
+  <section class="slide" data-type="content" data-dot="9" data-chapter="2" data-chapter-title="The report"
+            data-headline="The upgraded client portal raised a bigger question.">
+    <div class="eyebrow mono">09 · The report</div>
+    <div class="slide-body s9-body">
+      <h1 class="headline s9-headline">The upgraded client portal raised a bigger question.</h1>
+      <p class="caption s9-caption">The new reporting experience highlighted an imbalance in our desktop products.</p>
+      <div class="imbalance-table mono">
+        <div class="it-cell it-label"></div>
+        <div class="it-cell it-head">Client Portal</div>
+        <div class="it-cell it-head">Legacy Website</div>
+        <div class="it-cell it-label">Audience</div>
+        <div class="it-cell">Assisted Clients</div>
+        <div class="it-cell">Self-serve Clients</div>
+        <div class="it-cell it-label">Reach</div>
+        <div class="it-cell">10%</div>
+        <div class="it-cell">90%</div>
+        <div class="it-cell it-label">Experience</div>
+        <div class="it-cell">Rich reporting &amp; detailed insights</div>
+        <div class="it-cell">Basic portfolio view, limited functionality</div>
+      </div>
+      <p class="imbalance-takeaway">Why should the better desktop experience be limited to just <span class="accent-num">10%</span> of users?</p>
+    </div>
+  </section>
+
+  <!-- Slide 7 -->
+  <section class="slide s10u" data-type="content" data-dot="10" data-chapter="2" data-chapter-title="The report" data-advance-stages="1"
+            data-headline="Scripbox decided to bring the client portal to everyone.">
+    <div class="eyebrow mono">10 · The report</div>
+    <div class="slide-body">
+      <h1 class="headline">Scripbox decided to bring the client portal to everyone.</h1>
+      <div class="unify-stage" id="unify-stage">
+        <div class="unify-platform portal" id="unify-portal"><span class="unify-prefix">Unified&nbsp;</span>Client Portal</div>
+        <div class="unify-platform legacy" id="unify-legacy">Legacy Website</div>
+        <div class="unify-card assisted" id="unify-card-assisted">
+          <svg class="uc-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 19.5c1.4-3.2 4-4.8 7-4.8s5.6 1.6 7 4.8"></path></svg>
+          Assisted Users
+        </div>
+        <div class="unify-card selfserve" id="unify-card-selfserve">
+          <svg class="uc-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 19.5c1.4-3.2 4-4.8 7-4.8s5.6 1.6 7 4.8"></path></svg>
+          Self-Serve Users
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAPTER 3 INTERSTITIAL -->
+  <section class="slide interstitial" data-type="interstitial" data-chapter="3">
+    <div class="chapter-eyebrow mono">Scripbox × Parallel</div>
+    <h2>Chapter 03 · The merge</h2>
+  </section>
+
+  <!-- Slide 8 -->
+  <section class="slide s11gap" data-type="content" data-dot="11" data-chapter="3" data-chapter-title="The merge"
+            data-headline="Opening the portal to everyone meant closing a gap first: transactions.">
+    <div class="eyebrow mono">11 · The merge</div>
+    <div class="slide-body split">
+      <div class="split-text">
+        <h1 class="headline">Opening the portal to everyone meant closing a gap first: transactions.</h1>
+        <hr class="rule">
+        <p class="caption">Assisted clients never needed to transact themselves. Their RM did it for them. But a portal for everyone meant the portal itself had to handle it.</p>
+      </div>
+    </div>
+    <div class="gap-panel">
+      <div class="ledger">
+        <div class="ledger-title">Client portal checklist</div>
+        <div class="ledger-row can"><span class="li-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>Portfolio viewing</div>
+        <div class="ledger-row can"><span class="li-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>Performance reporting</div>
+        <div class="ledger-row can"><span class="li-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>Downloading reports</div>
+        <div class="ledger-row can"><span class="li-badge"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></span>Wealth Overview</div>
+        <div class="ledger-row cant"><span class="li-badge"></span>Investing</div>
+        <div class="ledger-row cant"><span class="li-badge"></span>Withdrawing</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 9 -->
+  <section class="slide s12inv" data-type="content" data-dot="12" data-chapter="3" data-chapter-title="The merge" data-advance-stages="4"
+            data-headline="75%+ of users dropped off at the first step of the old invest flow.">
+    <div class="eyebrow mono">12 · The merge</div>
+    <div class="slide-body split">
+      <div class="split-text">
+        <h1 class="headline">75%+ of users dropped off at the first step of the old invest flow.</h1>
+        <p class="caption s12-sub">It couldn't be ported over as it was. It needed multiple UX improvements first.</p>
+        <ol class="reveal-list" id="s12-list">
+          <li class="shown">
+            <span class="rl-t">Too many decisions in a single step</span>
+            <span class="rl-d">Investment type, amount, schedule, step-up, and fund selection were all packed into a single screen, increasing cognitive load.</span>
+          </li>
+          <li>
+            <span class="rl-t">Primary CTA below the fold</span>
+            <span class="rl-d">Users had to scroll before reaching the primary action, delaying progression through the flow.</span>
+          </li>
+          <li>
+            <span class="rl-t">Hidden fund customization</span>
+            <span class="rl-d">The option to customize recommended funds was buried below the fold, making it easy to miss.</span>
+          </li>
+          <li>
+            <span class="rl-t">No sense of progression</span>
+            <span class="rl-d">The journey lacked a clear structure, making it difficult for users to understand where they were and what came next.</span>
+          </li>
+          <li>
+            <span class="rl-t">Weak visual hierarchy</span>
+            <span class="rl-d">Primary actions, secondary actions, and supporting information competed for attention instead of guiding users through the experience.</span>
+          </li>
+        </ol>
+      </div>
+      <div class="split-visual">
+        <div class="annotate-screen-zone" id="s12-screen-zone">
+          <div class="browser-frame" style="width:100%;">
+            <div class="browser-bar"><span class="b-dot"></span><span class="b-dot"></span><span class="b-dot"></span><div class="b-field"></div></div>
+            <div class="s12-screen-wrap">
+              <div class="media" id="s12-screen" data-src="assets/old invest flow.png" data-label="old invest flow.png — Legacy invest flow"></div>
+            </div>
+          </div>
+          <svg id="s12-svg" aria-hidden="true">
+            <defs>
+              <marker id="s12-arrowhead" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
+                <path d="M0,0 L7,3.5 L0,7 Z"></path>
+              </marker>
+            </defs>
+            <path id="s12-arrow" class="s12-line" d="" marker-end="url(#s12-arrowhead)"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 10 -->
+  <section class="slide s12inv s13new" data-type="content" data-dot="13" data-chapter="3" data-chapter-title="The merge" data-advance-stages="3"
+            data-headline="We redesigned the invest flow around four key principles.">
+    <div class="eyebrow mono">13 · The merge</div>
+    <div class="slide-body split">
+      <div class="split-text">
+        <h1 class="headline">We redesigned the invest flow around four key principles.</h1>
+        <ol class="reveal-list" id="s13-list">
+          <li class="shown">
+            <span class="rl-t">One decision at a time</span>
+            <span class="rl-d">The investment journey was broken into four focused steps, allowing users to make one decision at a time instead of navigating a long, overwhelming form.</span>
+          </li>
+          <li>
+            <span class="rl-t">Clear sense of progress</span>
+            <span class="rl-d">A progress indicator provided visibility into where users were in the journey and what remained, helping set expectations throughout the flow.</span>
+          </li>
+          <li>
+            <span class="rl-t">Consistent primary actions</span>
+            <span class="rl-d">A sticky primary CTA remained visible across every step, while page-level and in-step actions were clearly differentiated to create predictable interaction patterns.</span>
+          </li>
+          <li>
+            <span class="rl-t">Stronger information hierarchy</span>
+            <span class="rl-d">Primary tasks were prioritized, while supporting information like summaries and projections was positioned contextually, helping users focus on the right decision at the right time.</span>
+          </li>
+        </ol>
+      </div>
+      <div class="split-visual">
+        <div class="annotate-screen-zone" id="s13-screen-zone">
+          <div class="browser-frame" style="width:100%;">
+            <div class="browser-bar"><span class="b-dot"></span><span class="b-dot"></span><span class="b-dot"></span><div class="b-field"></div></div>
+            <div class="s12-screen-wrap">
+              <div class="media" id="s13-screen" data-src="assets/new invest flow.gif" data-label="new invest flow.gif — Redesigned invest flow"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 14: summary -->
+  <section class="slide ssum" data-type="content" data-dot="14" data-chapter="3" data-chapter-title="The merge"
+            data-headline="How we transformed the desktop experience">
+    <div class="eyebrow mono">14 · The merge</div>
+    <div class="slide-body">
+      <h1 class="headline large">How we transformed the desktop experience</h1>
+      <div class="problem-row">
+        <div class="problem-card">
+          <div class="problem-tag mono">Reporting</div>
+          <p class="problem-copy">A monthly PDF became live reporting inside the portal.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-tag mono">Platform</div>
+          <p class="problem-copy">Two platforms became one. The legacy website with limited functionality was shut down.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-tag mono">Invest flow</div>
+          <p class="problem-copy">Redesigned around the failure points behind a 75%+ drop-off at the first step.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 15: the partnership -->
+  <section class="slide closing-frame" data-type="content" data-dot="15" data-chapter="3" data-chapter-title="The merge"
+            data-headline="The partnership grew">
+    <div class="eyebrow mono">15 · The merge</div>
+    <p class="mono" style="color:var(--muted);margin-bottom:1rem;">Scripbox × Parallel</p>
+    <h1 class="headline">The partnership grew</h1>
+    <p class="caption closing-sub">Parallel went from designing one surface to leading design across Scripbox's client portal, app, and marketing. App case study is coming soon.</p>
+  </section>
+
+</div>
+
+<!-- Persistent hint -->
+<div id="hint" class="mono">→ to begin · C for contents</div>
+
+<!-- Dot navigation -->
+<nav id="dotnav" aria-label="Slide navigation"></nav>
+
+<!-- Contents button -->
+<button id="contents-btn">Contents</button>
+
+<!-- Footer strip -->
+<div id="footer-strip">
+  <div>Sushma Bhandari · Scripbox × Parallel</div>
+  <div class="mono" id="footer-counter">01 / 15</div>
+</div>
+
+<!-- Corner arrows -->
+<div id="nav-arrows">
+  <button class="nav-arrow" id="arrow-prev" aria-label="Previous slide">←</button>
+  <button class="nav-arrow" id="arrow-next" aria-label="Next slide">→</button>
+</div>
+
+<!-- Contents overlay -->
+<div id="contents-overlay" role="dialog" aria-modal="true">
+  <button class="close-x" id="contents-close">×</button>
+  <div id="toc-list"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function isMobileLayout(){
+    return window.matchMedia('(max-width:768px)').matches ||
+           (window.matchMedia('(hover:none)').matches && window.matchMedia('(pointer:coarse)').matches);
+  }
+
+  /* ---------------- media placeholder loader ---------------- */
+  function initMedia(){
+    var nodes = document.querySelectorAll('.media[data-src]');
+    nodes.forEach(function(el){
+      var src = el.getAttribute('data-src');
+      var label = el.getAttribute('data-label') || src;
+      var labelEl = document.createElement('div');
+      labelEl.className = 'media-label mono';
+      labelEl.textContent = label;
+      el.appendChild(labelEl);
+      var img = new Image();
+      img.onload = function(){
+        el.style.backgroundImage = 'url("' + src + '")';
+        el.classList.add('loaded');
+      };
+      img.onerror = function(){ /* keep placeholder */ };
+      img.src = src;
+    });
+  }
+
+  /* ---------------- slide model ---------------- */
+  var slideEls = Array.prototype.slice.call(document.querySelectorAll('#deck > .slide'));
+  var slides = slideEls.map(function(el, i){
+    return {
+      el: el,
+      index: i,
+      type: el.getAttribute('data-type'),
+      dot: el.getAttribute('data-dot') ? parseInt(el.getAttribute('data-dot'), 10) : null,
+      chapter: el.getAttribute('data-chapter') ? parseInt(el.getAttribute('data-chapter'), 10) : null,
+      chapterTitle: el.getAttribute('data-chapter-title') || '',
+      headline: el.getAttribute('data-headline') || '',
+      advanceStages: el.getAttribute('data-advance-stages') ? parseInt(el.getAttribute('data-advance-stages'), 10) : 0
+    };
+  });
+
+  var contentSlides = slides.filter(function(s){ return s.type === 'content'; });
+  var chapterNames = {1:'The brief', 2:'The report', 3:'The merge'};
+  var chapterRanges = {1:[1,3], 2:[4,10], 3:[11,15]};
+
+  var current = 0;
+  var stage = 0;
+  var hintDismissed = false;
+  var firstAdvanceDone = false;
+
+  function slideByHash(hash){
+    var m = /#slide-(\d+)/.exec(hash || '');
+    if(!m) return null;
+    var n = parseInt(m[1], 10);
+    var target = slides.find(function(s){ return s.dot === n; });
+    return target ? target.index : null;
+  }
+
+  /* ---------------- dot nav build ---------------- */
+  var dotnav = document.getElementById('dotnav');
+  var dotCapsule = document.createElement('div');
+  dotCapsule.className = 'dot-capsule';
+  var capsuleContents = document.createElement('button');
+  capsuleContents.className = 'capsule-contents';
+  capsuleContents.id = 'capsule-contents';
+  capsuleContents.textContent = 'Contents';
+  dotCapsule.appendChild(capsuleContents);
+  var groups = [[1,3],[4,10],[11,15]];
+  var groupNames = ['The brief','The report','The merge'];
+  groups.forEach(function(range, gi){
+    var group = document.createElement('div');
+    group.className = 'dot-group';
+    var label = document.createElement('div');
+    label.className = 'dot-group-label mono';
+    label.textContent = groupNames[gi];
+    group.appendChild(label);
+    for(var n = range[0]; n <= range[1]; n++){
+      (function(n){
+        var wrap = document.createElement('div');
+        wrap.className = 'dot-wrap';
+        wrap.dataset.dot = n;
+        var dot = document.createElement('div');
+        dot.className = 'dot';
+        wrap.appendChild(dot);
+
+        var thumb = document.createElement('div');
+        thumb.className = 'thumb-preview';
+        var thumbMedia = document.createElement('div');
+        thumbMedia.className = 'media';
+        thumbMedia.setAttribute('data-src', 'assets/thumbs/thumb-' + String(n).padStart(2,'0') + '.png');
+        var slideForDot = slides.find(function(s){ return s.dot === n; });
+        thumbMedia.setAttribute('data-label', 'thumb-' + String(n).padStart(2,'0') + '.png');
+        thumb.appendChild(thumbMedia);
+        var cap = document.createElement('div');
+        cap.className = 'thumb-caption';
+        cap.textContent = slideForDot ? slideForDot.headline : '';
+        thumb.appendChild(cap);
+        wrap.appendChild(thumb);
+
+        wrap.addEventListener('click', function(){
+          goToDot(n);
+        });
+        group.appendChild(wrap);
+      })(n);
+    }
+    dotCapsule.appendChild(group);
+  });
+  dotnav.appendChild(dotCapsule);
+
+  function goToDot(n){
+    var target = slides.find(function(s){ return s.dot === n; });
+    if(target){ setCurrent(target.index, 0); }
+  }
+
+  function updateDots(){
+    var activeDot = getActiveDotForIndex(current);
+    dotnav.querySelectorAll('.dot-wrap').forEach(function(w){
+      var n = parseInt(w.dataset.dot, 10);
+      w.classList.toggle('current', n === activeDot);
+    });
+  }
+
+  function getActiveDotForIndex(idx){
+    var s = slides[idx];
+    if(s.type === 'content') return s.dot;
+    if(s.type === 'interstitial'){
+      for(var i = idx + 1; i < slides.length; i++){
+        if(slides[i].type === 'content') return slides[i].dot;
+      }
+    }
+    return null;
+  }
+
+  /* ---------------- eyebrow / footer ---------------- */
+  function updateChrome(){
+    var s = slides[current];
+    var activeDot = getActiveDotForIndex(current);
+    var footerCounter = document.getElementById('footer-counter');
+    if(s.type === 'content'){
+      footerCounter.style.display = '';
+      footerCounter.textContent = String(s.dot).padStart(2,'0') + ' / 15';
+    } else {
+      footerCounter.style.display = 'none';
+    }
+    updateDots();
+  }
+
+  /* ---------------- contents overlay ---------------- */
+  var tocList = document.getElementById('toc-list');
+  [1,2,3].forEach(function(ch){
+    var range = chapterRanges[ch];
+    var chapterDiv = document.createElement('div');
+    chapterDiv.className = 'toc-chapter';
+    var h3 = document.createElement('h3');
+    h3.textContent = '0' + ch + ' ' + chapterNames[ch] + ' (slides ' + range[0] + '-' + range[1] + ')';
+    chapterDiv.appendChild(h3);
+    contentSlides.filter(function(s){ return s.dot >= range[0] && s.dot <= range[1]; }).forEach(function(s){
+      var item = document.createElement('div');
+      item.className = 'toc-item';
+      item.innerHTML = '<span class="toc-num mono">' + String(s.dot).padStart(2,'0') + '</span><span class="toc-headline">' + s.headline + '</span>';
+      item.addEventListener('click', function(){
+        setCurrent(s.index, 0);
+        closeOverlay();
+      });
+      chapterDiv.appendChild(item);
+    });
+    tocList.appendChild(chapterDiv);
+  });
+
+  var overlay = document.getElementById('contents-overlay');
+  function openOverlay(){ overlay.classList.add('open'); }
+  function closeOverlay(){ overlay.classList.remove('open'); }
+  document.getElementById('contents-btn').addEventListener('click', openOverlay);
+  document.getElementById('capsule-contents').addEventListener('click', openOverlay);
+  document.getElementById('contents-close').addEventListener('click', closeOverlay);
+  overlay.addEventListener('click', function(e){
+    if(e.target === overlay) closeOverlay();
+  });
+
+  /* ---------------- hint ---------------- */
+  var hintEl = document.getElementById('hint');
+  function dismissHint(){
+    if(hintDismissed) return;
+    hintDismissed = true;
+    hintEl.classList.add('hidden');
+  }
+
+  /* ================= SLIDE-SPECIFIC MOTION ================= */
+
+  /* Slide 1: count-up */
+  var s1Done = false;
+  function runSlide1(){
+    var el = document.getElementById('s1-counter');
+    if(!el) return;
+    if(s1Done || reduceMotion){
+      el.textContent = '₹21,000 Cr+';
+      s1Done = true;
+      return;
+    }
+    s1Done = true;
+    var start = null;
+    var duration = 800;
+    function step(ts){
+      if(!start) start = ts;
+      var p = Math.min((ts - start) / duration, 1);
+      var val = Math.round(p * 21000);
+      el.textContent = '₹' + val.toLocaleString('en-IN') + ' Cr+';
+      if(p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* Slide 2: acquisition callouts merge into Scripbox */
+  var s2Firms = [
+    {name:'Mitraz', city:'Bengaluru', x:34.2, y:81.4, anchor:'left'},
+    {name:'Wealth Managers', city:'Pune', x:22.8, y:63.2, anchor:'right'},
+    {name:'A.K. Narayan', city:'Chennai', x:42.4, y:81.1, anchor:'right'},
+    {name:'Sujata Kabraji', city:'Mumbai', x:19.8, y:61.3, anchor:'left'},
+    {name:'Bluechip Capital', city:'Delhi NCR', x:33.1, y:29.8, anchor:'top'}
+  ];
+  var s2AnchorBase = {
+    top:'translate(-50%, calc(-100% - 14px))',
+    bottom:'translate(-50%, 14px)',
+    left:'translate(calc(-100% - 14px), -50%)',
+    right:'translate(14px, -50%)'
+  };
+  var s2Built = false;
+  function buildSlide2(){
+    if(s2Built) return;
+    s2Built = true;
+    var frame = document.getElementById('s2-map-frame');
+    s2Firms.forEach(function(firm){
+      var pin = document.createElement('div');
+      pin.className = 'acq-pin';
+      pin.style.setProperty('--px', firm.x + '%');
+      pin.style.setProperty('--py', firm.y + '%');
+      frame.appendChild(pin);
+      firm.pinEl = pin;
+
+      var callout = document.createElement('div');
+      callout.className = 'acq-callout mono';
+      callout.dataset.anchor = firm.anchor;
+      callout.style.setProperty('--px', firm.x + '%');
+      callout.style.setProperty('--py', firm.y + '%');
+      callout.innerHTML = '<div class="a-name">' + firm.name + '</div><div class="a-city">' + firm.city + '</div>';
+      frame.appendChild(callout);
+      firm.calloutEl = callout;
+    });
+  }
+  function mergeSlide2(){
+    buildSlide2();
+    var logo = document.getElementById('s2-logo');
+    var logoBox = logo.getBoundingClientRect();
+    s2Firms.forEach(function(firm, i){
+      var calloutBox = firm.calloutEl.getBoundingClientRect();
+      var dx = (logoBox.left + logoBox.width/2) - (calloutBox.left + calloutBox.width/2);
+      var dy = (logoBox.top + logoBox.height/2) - (calloutBox.top + calloutBox.height/2);
+      setTimeout(function(){
+        firm.calloutEl.style.transform = s2AnchorBase[firm.anchor] + ' translate(' + dx + 'px,' + dy + 'px) scale(0.25)';
+        firm.calloutEl.classList.add('flying');
+        firm.pinEl.classList.add('gone');
+      }, i * 90);
+    });
+    setTimeout(function(){
+      logo.classList.add('pulse');
+      setTimeout(function(){ logo.classList.remove('pulse'); }, 400);
+    }, s2Firms.length * 90 + 450);
+  }
+  function resetSlide2(){
+    buildSlide2();
+    var logo = document.getElementById('s2-logo');
+    s2Firms.forEach(function(firm){
+      firm.calloutEl.classList.remove('flying');
+      firm.calloutEl.style.transform = '';
+      firm.pinEl.classList.remove('gone');
+    });
+    if(logo) logo.classList.remove('pulse');
+  }
+
+  /* Slide 3: strikethrough */
+  function runSlide3(){
+    var el = document.getElementById('s3-strike');
+    if(!el) return;
+    el.classList.remove('struck');
+    if(reduceMotion){
+      el.classList.add('struck');
+      return;
+    }
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){ el.classList.add('struck'); });
+    });
+  }
+
+  /* Slide 4b: guided report reveal */
+  function renderSlide4b(n){
+    var all = reduceMotion || isMobileLayout();
+    document.querySelectorAll('#s4b-list li').forEach(function(li, i){
+      li.classList.toggle('shown', all || i <= n);
+      li.classList.toggle('line-on', all || i < n);
+    });
+    document.querySelectorAll('#s4b-screens .media').forEach(function(m, i){
+      m.classList.toggle('show', i === n);
+    });
+    var more = document.getElementById('s4b-more');
+    if(more) more.classList.toggle('shown', all || n >= 4);
+  }
+
+  /* Slide 7: bring-over sort */
+  /* st: keep | up (upcoming version) | out (removed); g: group index for kept cards */
+  var sortItems = [
+    {name:'Wealth Overview', st:'keep', g:0},
+    {name:'Product Distribution', st:'keep', g:0},
+    {name:'Monthly & Annual Change', st:'keep', g:1},
+    {name:'Investor Distribution', st:'keep', g:2},
+    {name:'Asset & Sub-asset Distribution', st:'keep', g:2},
+    {name:'Inflation Benchmark', st:'out', g:-1},
+    {name:'Index Benchmark', st:'keep', g:1},
+    {name:'Market Drawdown', st:'out', g:-1},
+    {name:'Fund Overlap', st:'out', g:-1},
+    {name:'Exit Recommendations', st:'up', g:-1},
+    {name:'Rebalancing', st:'up', g:-1},
+    {name:'SIP Actions', st:'up', g:-1},
+    {name:'AMC Distribution', st:'keep', g:2},
+    {name:'Cash Flows', st:'keep', g:1},
+    {name:'Holdings', st:'keep', g:3}
+  ];
+  var sortVerdicts = {keep:'Keep', up:'Upcoming version', out:'Remove'};
+  var sortGroups = ['Home', 'Performance insights', 'Distribution', 'Holdings'];
+  var sortKept = sortItems.map(function(it, i){ return i; }).filter(function(i){ return sortItems[i].st === 'keep'; });
+  var sortCards = [];
+  var sortLabels = [];
+  var sortLastBeat = 0;
+  var SORT_GAP = 16;
+  function buildSortSlide(){
+    if(sortCards.length) return;
+    var grid = document.getElementById('sort-grid');
+    sortItems.forEach(function(it, i){
+      var d = document.createElement('div');
+      d.className = 'sc-card c-' + it.st;
+      d.innerHTML = '<div class="sc-name">' + it.name + '</div>'
+        + '<span class="sc-verd v-' + it.st + '"><span class="dot"></span>' + sortVerdicts[it.st] + '</span>';
+      d.style.transitionDelay = (i * 40) + 'ms';
+      d.style.setProperty('--fall', ((i % 2 ? 1 : -1) * (4 + i % 7)) + 'deg');
+      grid.appendChild(d);
+      sortCards.push(d);
+    });
+    sortGroups.forEach(function(name){
+      var l = document.createElement('div');
+      l.className = 'sort-group-label';
+      l.textContent = name;
+      grid.appendChild(l);
+      sortLabels.push(l);
+    });
+    layoutSort(0);
+  }
+  function placeSortCard(el, x, y, w, h){
+    el.style.setProperty('--pos', 'translate(' + x + 'px,' + y + 'px)');
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+  }
+  function layoutSort(beat){
+    sortLastBeat = beat;
+    var grid = document.getElementById('sort-grid');
+    var gw = grid.clientWidth, gh = grid.clientHeight;
+    var colW = (gw - 3*SORT_GAP)/4;
+    sortLabels.forEach(function(l, g){
+      l.style.left = (g*(colW + SORT_GAP)) + 'px';
+      l.style.width = colW + 'px';
+    });
+    if(beat < 4){
+      var cw = (gw - 4*SORT_GAP)/5, ch = (gh - 2*SORT_GAP)/3;
+      if(beat <= 1){
+        sortCards.forEach(function(d, i){
+          placeSortCard(d, (i%5)*(cw+SORT_GAP), Math.floor(i/5)*(ch+SORT_GAP), cw, ch);
+        });
+      } else {
+        /* kept cards compact into the same 5x3 slots, left-aligned; bottom stays empty */
+        sortKept.forEach(function(ci, slot){
+          placeSortCard(sortCards[ci], (slot%5)*(cw+SORT_GAP), Math.floor(slot/5)*(ch+SORT_GAP), cw, ch);
+        });
+      }
+    } else {
+      var labelH = 26;
+      var gh2 = (gh - labelH - 3*SORT_GAP)/3;
+      var counts = [0, 0, 0, 0];
+      sortCards.forEach(function(d, i){
+        var g = sortItems[i].g;
+        if(g < 0) return;
+        var slot = counts[g]++;
+        placeSortCard(d, g*(colW+SORT_GAP), labelH + SORT_GAP + slot*(gh2+SORT_GAP), colW, gh2);
+      });
+    }
+  }
+  function setSortBeat(n){
+    var sec = document.getElementById('slide-sort');
+    sec.classList.remove('b0','b1','b2','b3','b4');
+    sec.classList.add('b' + n);
+    var heads = sec.querySelectorAll('.sort-head .hswap');
+    heads.forEach(function(h, i){ h.classList.toggle('show', i === (n === 0 ? 0 : (n <= 2 ? 1 : 2))); });
+    layoutSort(n);
+  }
+  function resetSortSlide(){
+    buildSortSlide();
+    var sec = document.getElementById('slide-sort');
+    sec.classList.remove('b0','b1','b2','b3','b4');
+    layoutSort(0);
+    void sec.offsetWidth;
+    setSortBeat(0);
+  }
+  window.addEventListener('resize', function(){
+    if(sortCards.length) layoutSort(sortLastBeat);
+  });
+
+  /* Slide 8: information architecture callouts */
+  /* beats 0-2: old nav, problems 1-3; beats 3-5: new nav, solutions 1-3 */
+  /* arrow targets as fractions of the screen area, [old set, new set] */
+  var navTargets = [
+    [[0.095, 0.22], [0.085, 0.31], [0.085, 0.9]],
+    [[0.088, 0.3], [0.27, 0.195], [0.27, 0.92]]
+  ];
+  var navBeat = 0;
+  function navShowAll(){ return reduceMotion || isMobileLayout(); }
+  function drawNavArrows(){
+    var body = document.getElementById('nav-body');
+    var svg = document.getElementById('ia-arrows');
+    var screens = document.getElementById('nav-screens');
+    if(!body || !svg || !screens) return;
+    svg.querySelectorAll('path.nav-line').forEach(function(p){ p.remove(); });
+    var sr = body.getBoundingClientRect();
+    var mr = screens.getBoundingClientRect();
+    if(!sr.width || !mr.width) return;
+    var state = navBeat >= 3 ? 1 : 0;
+    var idx = state ? navBeat - 3 : navBeat;
+    var list = document.getElementById(state ? 'nav-callouts-new' : 'nav-callouts-old');
+    var t = navTargets[state];
+    list.querySelectorAll('.nav-callout').forEach(function(c, i){
+      if(!navShowAll() && i !== idx) return;
+      var cr = c.getBoundingClientRect();
+      var sx = cr.right - sr.left + 10, sy = cr.top + cr.height/2 - sr.top;
+      var ex = mr.left - sr.left + t[i][0]*mr.width;
+      var ey = mr.top - sr.top + t[i][1]*mr.height;
+      var dx = ex - sx;
+      var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('class', 'nav-line');
+      p.setAttribute('d', 'M' + sx + ',' + sy
+        + ' C' + (sx + dx*0.45) + ',' + sy
+        + ' ' + (ex - dx*0.35) + ',' + ey
+        + ' ' + ex + ',' + ey);
+      p.setAttribute('marker-end', 'url(#ia-arrowhead)');
+      p.style.transitionDelay = '250ms';
+      svg.appendChild(p);
+    });
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        svg.querySelectorAll('path.nav-line').forEach(function(p){ p.classList.add('show'); });
+      });
+    });
+  }
+  function setNavBeat(n){
+    navBeat = n;
+    var state = n >= 3 ? 1 : 0;
+    var idx = state ? n - 3 : n;
+    var all = navShowAll();
+    var sec = document.getElementById('slide-nav');
+    sec.classList.toggle('state-new', state === 1);
+    sec.querySelectorAll('.nav-head .hswap').forEach(function(h, i){ h.classList.toggle('show', i === state); });
+    document.getElementById('nav-callouts-old').classList.toggle('show', state === 0);
+    document.getElementById('nav-callouts-new').classList.toggle('show', state === 1);
+    document.getElementById('nav-media-old').classList.toggle('show', state === 0);
+    document.getElementById('nav-media-new').classList.toggle('show', state === 1);
+    var list = document.getElementById(state ? 'nav-callouts-new' : 'nav-callouts-old');
+    list.querySelectorAll('.nav-callout').forEach(function(c, i){
+      c.classList.toggle('active', all || i <= idx);
+    });
+    drawNavArrows();
+  }
+  function resetNavSlide(){
+    setNavBeat(0);
+  }
+  window.addEventListener('resize', function(){
+    if(document.getElementById('slide-nav').classList.contains('active')) drawNavArrows();
+  });
+
+  /* Slide 6: none */
+
+  /* Slide 7: portal unify diagram */
+  function setUnifyMerged(merged){
+    var stageEl = document.getElementById('unify-stage');
+    if(stageEl) stageEl.classList.toggle('merged', !!merged);
+  }
+  function resetUnifySlide(){
+    setUnifyMerged(reduceMotion || isMobileLayout());
+  }
+
+  /* Slide 8: none (transaction-gap ledger is static) */
+
+  /* Slide 9: invest flow annotations */
+  var s12Regions = [
+    {top:16, left:19, width:33, height:54},
+    {top:71, left:19.5, width:31.5, height:6},
+    {top:90, left:57.5, width:11.5, height:5},
+    {top:10.5, left:13, width:20, height:6},
+    {top:58, left:3, width:94, height:30}
+  ];
+  var s12ArrowTimer;
+  function renderSlide12(n){
+    var all = reduceMotion || isMobileLayout();
+    var items = document.querySelectorAll('#s12-list li');
+    items.forEach(function(li, i){
+      li.classList.toggle('shown', all || i <= n);
+      li.classList.toggle('line-on', all || i < n);
+      li.classList.toggle('open', all || i === n);
+    });
+    var arrow = document.getElementById('s12-arrow');
+    arrow.classList.remove('show');
+    if(all){ return; }
+    clearTimeout(s12ArrowTimer);
+    s12ArrowTimer = setTimeout(function(){
+      var region = s12Regions[n];
+      var screenBox = document.getElementById('s12-screen').getBoundingClientRect();
+      var svgBox = document.getElementById('s12-svg').getBoundingClientRect();
+      var title = items[n].querySelector('.rl-t');
+      var tBox = title.getBoundingClientRect();
+      var x1 = tBox.right - svgBox.left + 10;
+      var y1 = (tBox.top + tBox.height/2) - svgBox.top;
+      var x2 = (screenBox.left + screenBox.width * (region.left/100)) - svgBox.left - 4;
+      var y2 = (screenBox.top + screenBox.height * ((region.top + region.height/2)/100)) - svgBox.top;
+      arrow.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' C ' + (x1+40) + ' ' + y1 + ', ' + (x2-40) + ' ' + y2 + ', ' + x2 + ' ' + y2);
+      arrow.classList.add('show');
+    }, 380);
+  }
+  function resetSlide12(){
+    renderSlide12(0);
+  }
+
+  /* Slide 10: redesign principles */
+  function renderSlide13(n){
+    var all = reduceMotion || isMobileLayout();
+    var items = document.querySelectorAll('#s13-list li');
+    items.forEach(function(li, i){
+      li.classList.toggle('shown', all || i <= n);
+      li.classList.toggle('line-on', all || i < n);
+      li.classList.toggle('open', all || i <= n);
+    });
+  }
+  function resetSlide13(){
+    renderSlide13(0);
+  }
+
+  /* ---------------- slide entry dispatcher ---------------- */
+  function onSlideEnter(idx){
+    var s = slides[idx];
+    if(s.dot === 1) runSlide1();
+    if(s.dot === 2){ resetSlide2(); }
+    if(s.dot === 3) runSlide3();
+    if(s.dot === 5) renderSlide4b(stage || 0);
+    if(s.dot === 7) resetSortSlide();
+    if(s.dot === 8) resetNavSlide();
+    if(s.dot === 10) resetUnifySlide();
+    if(s.dot === 12) resetSlide12();
+    if(s.dot === 13) resetSlide13();
+  }
+
+  /* ---------------- render / navigation ---------------- */
+  function render(){
+    slides.forEach(function(s, i){
+      s.el.classList.toggle('active', i === current);
+    });
+    document.body.classList.toggle('s3-active', slides[current].el.classList.contains('s3'));
+    updateChrome();
+    var s = slides[current];
+    if(s.dot){
+      history.replaceState(null, '', '#slide-' + s.dot);
+    }
+  }
+
+  function setCurrent(idx, newStage){
+    idx = Math.max(0, Math.min(slides.length - 1, idx));
+    current = idx;
+    stage = newStage || 0;
+    render();
+    onSlideEnter(current);
+  }
+
+  function next(){
+    dismissHint();
+    var s = slides[current];
+    var maxStage = (reduceMotion || isMobileLayout()) ? 0 : s.advanceStages;
+    if(stage < maxStage){
+      stage++;
+      if(s.dot === 2){
+        if(stage === 1) mergeSlide2();
+      } else if(s.dot === 5){
+        renderSlide4b(stage);
+      } else if(s.dot === 7){
+        setSortBeat(stage);
+      } else if(s.dot === 8){
+        setNavBeat(stage);
+      } else if(s.dot === 10){
+        if(stage === 1) setUnifyMerged(true);
+      } else if(s.dot === 12){
+        renderSlide12(stage);
+      } else if(s.dot === 13){
+        renderSlide13(stage);
+      }
+      return;
+    }
+    if(current < slides.length - 1){
+      setCurrent(current + 1, 0);
+    }
+  }
+
+  function prev(){
+    var s = slides[current];
+    if(stage > 0 && !(reduceMotion || isMobileLayout())){
+      if(s.dot === 5){ stage--; renderSlide4b(stage); return; }
+      if(s.dot === 7){ stage--; setSortBeat(stage); return; }
+      if(s.dot === 8){ stage--; setNavBeat(stage); return; }
+      if(s.dot === 10){ stage--; setUnifyMerged(false); return; }
+      if(s.dot === 12){ stage--; renderSlide12(stage); return; }
+      if(s.dot === 13){ stage--; renderSlide13(stage); return; }
+    }
+    if(current > 0){
+      setCurrent(current - 1, 0);
+    }
+  }
+
+  document.getElementById('arrow-prev').addEventListener('click', prev);
+  document.getElementById('arrow-next').addEventListener('click', next);
+
+  /* ---------------- keyboard ---------------- */
+  document.addEventListener('keydown', function(e){
+    if(isMobileLayout()) return;
+    if(e.key === 'Escape'){
+      if(overlay.classList.contains('open')) closeOverlay();
+      return;
+    }
+    if(overlay.classList.contains('open')) return;
+    if(e.key === 'ArrowRight'){ e.preventDefault(); next(); }
+    else if(e.key === 'ArrowLeft'){ e.preventDefault(); prev(); }
+    else if(e.key === 'c' || e.key === 'C'){
+      if(overlay.classList.contains('open')) closeOverlay(); else openOverlay();
+    }
+  });
+
+  /* ---------------- init ---------------- */
+  function applyLayoutMode(){
+    document.body.classList.toggle('mobile-layout', isMobileLayout());
+  }
+  window.addEventListener('resize', applyLayoutMode);
+
+  initMedia();
+  applyLayoutMode();
+  document.body.classList.toggle('reduced-motion', reduceMotion);
+
+  var startIdx = slideByHash(window.location.hash);
+  if(startIdx !== null){
+    current = startIdx;
+  }
+  render();
+  onSlideEnter(current);
+
+  window.addEventListener('hashchange', function(){
+    var idx = slideByHash(window.location.hash);
+    if(idx !== null && idx !== current){
+      setCurrent(idx, 0);
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
