@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Scripbox x Parallel — Case study</title>
 <meta name="description" content="Sushma Bhandari — leading design for Scripbox, a wealth management platform.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,17 +20,26 @@
 
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
+  html{
+    overflow:hidden;
+    background:var(--bg);
+    transition:background-color 500ms ease;
+    overscroll-behavior:none;
+  }
   body{
     background:var(--bg);
     color:var(--ink);
     font-family:'Inter',sans-serif;
     font-weight:400;
     overflow:hidden;
+    height:100vh;
     height:100dvh;
     width:100vw;
     transition:background-color 500ms ease;
+    overscroll-behavior:none;
+    touch-action:manipulation;
   }
-  body.dark-break{background:#141414;}
+  html.dark-break, body.dark-break{background:#141414;}
 
   h1,h2,h3{font-family:'Marcellus',serif;font-weight:400;letter-spacing:-0.46px;margin:0;}
   .mono{font-family:'Spline Sans Mono',monospace;}
@@ -1576,14 +1585,57 @@
   /* ---------------- uniform scale-to-fit ---------------- */
   var DESIGN_W = 1512, DESIGN_H = 950;
   var deckScale = 1;
+  var deckRotated = false;
+  var touchDevice = (navigator.maxTouchPoints > 0) ||
+    window.matchMedia('(pointer: coarse)').matches;
   function fitDeck(){
-    deckScale = Math.min(window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H);
-    document.getElementById('stage').style.transform = 'scale(' + deckScale + ')';
+    /* layout viewport, not window.innerWidth/Height: mobile browsers
+       change the latter with pinch zoom, auto shrink-to-fit and the
+       URL bar, which breaks the computed scale on phones */
+    var vw = document.documentElement.clientWidth || window.innerWidth;
+    var vh = document.documentElement.clientHeight || window.innerHeight;
+    var portrait = vh > vw;
+    /* portrait phone/tablet: rotate the whole stage 90deg so the deck
+       reads landscape without the user turning the device */
+    deckRotated = portrait && touchDevice;
+    var stage = document.getElementById('stage');
+    if(deckRotated){
+      deckScale = Math.min(vh / DESIGN_W, vw / DESIGN_H);
+      stage.style.transform = 'rotate(90deg) scale(' + deckScale + ')';
+    }else{
+      deckScale = Math.min(vw / DESIGN_W, vh / DESIGN_H);
+      stage.style.transform = 'scale(' + deckScale + ')';
+    }
     document.getElementById('rotate-hint').classList.toggle('show',
-      window.innerHeight > window.innerWidth);
+      portrait && !deckRotated);
   }
   window.addEventListener('resize', fitDeck);
-  window.addEventListener('orientationchange', fitDeck);
+  window.addEventListener('orientationchange', function(){
+    fitDeck();
+    /* iOS reports stale dimensions when orientationchange fires */
+    setTimeout(fitDeck, 300);
+  });
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', fitDeck);
+  }
+
+  /* rect math helpers: getBoundingClientRect returns visual px; these
+     convert back to design px, accounting for the portrait rotation */
+  function designDelta(vdx, vdy){
+    if(deckRotated){ return { x: vdy / deckScale, y: -vdx / deckScale }; }
+    return { x: vdx / deckScale, y: vdy / deckScale };
+  }
+  function designRect(el, ref){
+    var r = el.getBoundingClientRect();
+    if(deckRotated){
+      return { left:(r.top - ref.top) / deckScale,
+               top:(ref.right - r.right) / deckScale,
+               width:r.height / deckScale, height:r.width / deckScale };
+    }
+    return { left:(r.left - ref.left) / deckScale,
+             top:(r.top - ref.top) / deckScale,
+             width:r.width / deckScale, height:r.height / deckScale };
+  }
 
   /* ---------------- media placeholder loader ---------------- */
   function initMedia(){
@@ -1725,6 +1777,7 @@
     }
     document.body.classList.toggle('break-active', s.type !== 'content');
     document.body.classList.toggle('dark-break', s.type === 'interstitial');
+    document.documentElement.classList.toggle('dark-break', s.type === 'interstitial');
     updateDots();
   }
 
@@ -1837,8 +1890,10 @@
     var logoBox = logo.getBoundingClientRect();
     s2Firms.forEach(function(firm, i){
       var calloutBox = firm.calloutEl.getBoundingClientRect();
-      var dx = ((logoBox.left + logoBox.width/2) - (calloutBox.left + calloutBox.width/2)) / deckScale;
-      var dy = ((logoBox.top + logoBox.height/2) - (calloutBox.top + calloutBox.height/2)) / deckScale;
+      var d = designDelta(
+        (logoBox.left + logoBox.width/2) - (calloutBox.left + calloutBox.width/2),
+        (logoBox.top + logoBox.height/2) - (calloutBox.top + calloutBox.height/2));
+      var dx = d.x, dy = d.y;
       setTimeout(function(){
         firm.calloutEl.style.transform = s2AnchorBase[firm.anchor] + ' translate(' + dx + 'px,' + dy + 'px) scale(0.25)';
         firm.calloutEl.classList.add('flying');
@@ -2000,16 +2055,17 @@
     var sr = body.getBoundingClientRect();
     var mr = screens.getBoundingClientRect();
     if(!sr.width || !mr.width) return;
+    var mrD = designRect(screens, sr);
     var state = navBeat >= 3 ? 1 : 0;
     var idx = state ? navBeat - 3 : navBeat;
     var list = document.getElementById(state ? 'nav-callouts-new' : 'nav-callouts-old');
     var t = navTargets[state];
     list.querySelectorAll('.nav-callout').forEach(function(c, i){
       if(!navShowAll() && i !== idx) return;
-      var cr = c.getBoundingClientRect();
-      var sx = (cr.right - sr.left) / deckScale + 10, sy = (cr.top + cr.height/2 - sr.top) / deckScale;
-      var ex = (mr.left - sr.left + t[i][0]*mr.width) / deckScale;
-      var ey = (mr.top - sr.top + t[i][1]*mr.height) / deckScale;
+      var crD = designRect(c, sr);
+      var sx = crD.left + crD.width + 10, sy = crD.top + crD.height/2;
+      var ex = mrD.left + t[i][0]*mrD.width;
+      var ey = mrD.top + t[i][1]*mrD.height;
       var dx = ex - sx;
       var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       p.setAttribute('class', 'nav-line');
@@ -2090,14 +2146,14 @@
     clearTimeout(s12ArrowTimer);
     s12ArrowTimer = setTimeout(function(){
       var region = s12Regions[n];
-      var screenBox = document.getElementById('s12-screen').getBoundingClientRect();
       var svgBox = document.getElementById('s12-svg').getBoundingClientRect();
+      var screenD = designRect(document.getElementById('s12-screen'), svgBox);
       var title = items[n].querySelector('.rl-t');
-      var tBox = title.getBoundingClientRect();
-      var x1 = (tBox.right - svgBox.left) / deckScale + 10;
-      var y1 = ((tBox.top + tBox.height/2) - svgBox.top) / deckScale;
-      var x2 = ((screenBox.left + screenBox.width * (region.left/100)) - svgBox.left) / deckScale - 4;
-      var y2 = ((screenBox.top + screenBox.height * ((region.top + region.height/2)/100)) - svgBox.top) / deckScale;
+      var tD = designRect(title, svgBox);
+      var x1 = tD.left + tD.width + 10;
+      var y1 = tD.top + tD.height/2;
+      var x2 = screenD.left + screenD.width * (region.left/100) - 4;
+      var y2 = screenD.top + screenD.height * ((region.top + region.height/2)/100);
       arrow.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' C ' + (x1+40) + ' ' + y1 + ', ' + (x2-40) + ' ' + y2 + ', ' + x2 + ' ' + y2);
       drawArrowPath(arrow, 450, 0);
     }, 380);
