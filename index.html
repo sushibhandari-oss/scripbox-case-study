@@ -353,6 +353,69 @@
   .nav-arrow:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(20,20,20,0.2);}
   /* touch devices navigate by swipe; the arrows are too small to tap */
   body.touch #nav-arrows{display:none;}
+  body.touch #hint{display:none;}
+
+  /* ---------- swipe guide (touch devices, until first navigation) ---------- */
+  #swipe-guide{
+    position:absolute;
+    /* oversized so the film also covers the letterbox around the
+       scaled stage; harmless because the stage is position:fixed */
+    inset:-2000px;
+    z-index:90;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:1.5rem;
+    /* no backdrop-filter: it renders partially inside the rotated stage */
+    background:rgba(20,20,20,0.6);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity 450ms ease, visibility 0s linear 450ms;
+  }
+  body.touch #swipe-guide.show{
+    opacity:1;
+    visibility:visible;
+    transition:opacity 450ms ease;
+  }
+  .sg-track{
+    position:relative;
+    width:180px;
+    height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .sg-track::before{
+    content:"";
+    position:absolute;
+    left:0;right:0;top:50%;
+    height:1px;
+    background:rgba(250,250,247,0.3);
+  }
+  .sg-dot{
+    position:relative;
+    width:14px;height:14px;
+    border-radius:50%;
+    background:#FAFAF7;
+    box-shadow:0 0 0 7px rgba(250,250,247,0.18);
+    animation:sg-glide 2.4s ease-in-out infinite;
+  }
+  @keyframes sg-glide{
+    0%{transform:translateX(84px);opacity:0;}
+    14%{transform:translateX(66px);opacity:1;}
+    62%{transform:translateX(-70px);opacity:1;}
+    78%{transform:translateX(-84px);opacity:0;}
+    100%{transform:translateX(-84px);opacity:0;}
+  }
+  .sg-label{
+    color:#FAFAF7;
+    font-size:0.8rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+  }
+  body.reduced-motion .sg-dot{animation:none;}
 
   /* ---------- contents overlay ---------- */
   #contents-overlay{
@@ -1570,6 +1633,12 @@
   <button class="nav-arrow" id="arrow-next" aria-label="Next slide">→</button>
 </div>
 
+<!-- Swipe guide (touch devices, shown until first navigation) -->
+<div id="swipe-guide" aria-hidden="true">
+  <div class="sg-track"><div class="sg-dot"></div></div>
+  <div class="sg-label mono">Swipe to navigate</div>
+</div>
+
 <!-- Contents overlay -->
 <div id="contents-overlay" role="dialog" aria-modal="true">
   <button class="close-x" id="contents-close">×</button>
@@ -1811,7 +1880,12 @@
 
   /* ---------------- hint ---------------- */
   var hintEl = document.getElementById('hint');
+  var swipeGuide = document.getElementById('swipe-guide');
+  function dismissSwipeGuide(){
+    swipeGuide.classList.remove('show');
+  }
   function dismissHint(){
+    dismissSwipeGuide();
     if(hintDismissed) return;
     hintDismissed = true;
     hintEl.classList.add('hidden');
@@ -2212,6 +2286,7 @@
     idx = Math.max(0, Math.min(slides.length - 1, idx));
     current = idx;
     stage = newStage || 0;
+    dismissSwipeGuide();
     render();
     onSlideEnter(current);
   }
@@ -2247,6 +2322,7 @@
   }
 
   function prev(){
+    dismissSwipeGuide();
     var s = slides[current];
     if(stage > 0 && !reduceMotion){
       if(s.dot === 5){ stage--; renderSlide4b(stage); return; }
@@ -2313,7 +2389,7 @@
   fitDeck();
   document.body.classList.toggle('reduced-motion', reduceMotion);
   document.body.classList.toggle('touch', touchDevice);
-  if(touchDevice){ hintEl.textContent = 'Swipe to begin'; }
+  if(touchDevice){ swipeGuide.classList.add('show'); }
 
   /* Always open on the cover: ignore any stale #slide-N from a previous
      session and strip it from the URL. Hash navigation still works after
