@@ -348,6 +348,8 @@
     transition:transform 200ms ease, box-shadow 200ms ease;
   }
   .nav-arrow:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(20,20,20,0.2);}
+  /* touch devices navigate by swipe; the arrows are too small to tap */
+  body.touch #nav-arrows{display:none;}
 
   /* ---------- contents overlay ---------- */
   #contents-overlay{
@@ -1586,8 +1588,9 @@
   var DESIGN_W = 1512, DESIGN_H = 950;
   var deckScale = 1;
   var deckRotated = false;
-  var touchDevice = (navigator.maxTouchPoints > 0) ||
-    window.matchMedia('(pointer: coarse)').matches;
+  /* pointer:coarse = primary input is a finger (phone/tablet), so a
+     touchscreen laptop driven by a mouse still gets desktop chrome */
+  var touchDevice = window.matchMedia('(pointer: coarse)').matches;
   function fitDeck(){
     /* layout viewport, not window.innerWidth/Height: mobile browsers
        change the latter with pinch zoom, auto shrink-to-fit and the
@@ -2259,6 +2262,28 @@
   document.getElementById('arrow-prev').addEventListener('click', prev);
   document.getElementById('arrow-next').addEventListener('click', next);
 
+  /* ---------------- touch: swipe to navigate ---------------- */
+  /* designDelta maps the gesture into deck space, so the swipe axis is
+     automatically correct when the stage is rotated on portrait phones */
+  var swipeStart = null;
+  document.addEventListener('touchstart', function(e){
+    swipeStart = (e.touches.length === 1)
+      ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      : null;
+  }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    var start = swipeStart;
+    swipeStart = null;
+    if(!start || e.touches.length) return;
+    if(overlay.classList.contains('open')) return;
+    var vdx = e.changedTouches[0].clientX - start.x;
+    var vdy = e.changedTouches[0].clientY - start.y;
+    if(Math.hypot(vdx, vdy) < 48) return; /* too short: it is a tap */
+    var d = designDelta(vdx, vdy);
+    if(Math.abs(d.x) <= Math.abs(d.y)) return;
+    if(d.x < 0){ next(); } else { prev(); }
+  }, {passive:true});
+
   /* ---------------- keyboard ---------------- */
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape'){
@@ -2277,6 +2302,8 @@
   initMedia();
   fitDeck();
   document.body.classList.toggle('reduced-motion', reduceMotion);
+  document.body.classList.toggle('touch', touchDevice);
+  if(touchDevice){ hintEl.textContent = 'Swipe to begin'; }
 
   /* Always open on the cover: ignore any stale #slide-N from a previous
      session and strip it from the URL. Hash navigation still works after
