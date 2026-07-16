@@ -51,7 +51,10 @@
      one uniform transform:scale() to fit the viewport; leftover space
      letterboxes in --bg via the body background. */
   #stage{
-    position:absolute;
+    /* fixed, not absolute: fixed boxes never extend the document's
+       scrollable area, so the oversized (and on phones, rotated) stage
+       cannot open up scrollable empty space on mobile */
+    position:fixed;
     left:50%;
     top:50%;
     width:1512px;
@@ -2263,6 +2266,13 @@
   document.getElementById('arrow-next').addEventListener('click', next);
 
   /* ---------------- touch: swipe to navigate ---------------- */
+  /* iOS Safari pans the page on touch even with overflow:hidden, which
+     scrolled the deck into empty space; block native single-finger
+     panning outright (two-finger pinch zoom stays available) */
+  document.addEventListener('touchmove', function(e){
+    if(e.touches.length === 1){ e.preventDefault(); }
+  }, {passive:false});
+
   /* designDelta maps the gesture into deck space, so the swipe axis is
      automatically correct when the stage is rotated on portrait phones */
   var swipeStart = null;
