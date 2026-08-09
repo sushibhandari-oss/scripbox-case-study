@@ -572,6 +572,21 @@
   /* ---------- Slide 3 ---------- */
   .s3-sub{margin-top:1.6rem;color:var(--muted);max-width:38rem;}
 
+  .s3-hint{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:0.4rem;
+    margin-top:2.6rem;
+  }
+  .s3-hint-label{
+    font-size:0.72rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .s3-hint-arrow{display:block;}
+
   .slide.s3{justify-content:flex-start;padding-top:152px;}
   .slide.s3 .slide-body{max-width:none;width:100%;}
   .s3-headline{max-width:none;width:75%;}
@@ -1232,6 +1247,13 @@
     <div class="slide-body">
       <h1 class="headline s3-headline">The client portal became the one platform all assisted clients would use.</h1>
       <p class="caption s3-sub">A single experience for assisted clients, built for viewing and reporting only. Since RMs handled transactions on their behalf, the portal never needed to.</p>
+      <div class="s3-hint">
+        <span class="s3-hint-label mono">Hover to explore</span>
+        <svg class="s3-hint-arrow" width="34" height="70" viewBox="0 0 34 70" fill="none" aria-hidden="true">
+          <path d="M7 4C19 12 -1 20 11 28C23 36 3 44 15 52" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M6 47L15 60L25 49" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
     </div>
     <div class="fan-bottom">
       <div class="fan-card" style="--fx:-106px;--fb:-104px;--fr:-2deg;--fz:1;">
