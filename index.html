@@ -986,7 +986,7 @@
     grid-template-columns:repeat(2,1fr);
     grid-template-rows:repeat(2,1fr);
     gap:1.5rem;
-    margin-top:3rem;
+    margin-top:5.5rem;
   }
   .quote-card{
     position:relative;
@@ -1021,11 +1021,12 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    font-family:'Marcellus',serif;
-    font-size:2.7rem;
-    color:var(--accent);
-    line-height:1;
     box-shadow:0 10px 24px rgba(20,20,20,0.1);
+  }
+  .quote-badge img{
+    width:2.15rem;
+    height:2.15rem;
+    transform:rotate(180deg);
   }
   .quote-card.standout .quote-badge{border-color:var(--accent);}
   .research-panel{
@@ -1392,19 +1393,19 @@
       <h1 class="headline">Would self-serve users find value in it? We tested it with them to find out.</h1>
       <div class="quote-grid">
         <figure class="quote-card">
-          <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+          <span class="quote-badge" aria-hidden="true"><img src="assets/quote-mark.png" alt=""></span>
           <blockquote><p>For everyday stuff I'll still use the app. That's where I invest.</p></blockquote>
         </figure>
         <figure class="quote-card">
-          <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+          <span class="quote-badge" aria-hidden="true"><img src="assets/quote-mark.png" alt=""></span>
           <blockquote><p>I never really had a reason to open the website. This actually shows me things the app doesn't.</p></blockquote>
         </figure>
         <figure class="quote-card">
-          <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+          <span class="quote-badge" aria-hidden="true"><img src="assets/quote-mark.png" alt=""></span>
           <blockquote><p>Can you put this in the app too? I'd want to see it on my phone.</p></blockquote>
         </figure>
         <figure class="quote-card standout">
-          <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+          <span class="quote-badge" aria-hidden="true"><img src="assets/quote-mark.png" alt=""></span>
           <blockquote><p>Seeing how I'm doing against the Nifty 50 is what I'd come back for.</p></blockquote>
         </figure>
       </div>
