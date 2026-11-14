@@ -1032,7 +1032,12 @@
   .s12-sub{font-size:0.95rem;color:var(--muted);margin:0 0 2.6rem;}
   .s12-screen-wrap{position:relative;}
   #s12-screen{width:100%;aspect-ratio:2048/1622;}
-  #s13-screen{width:100%;aspect-ratio:2419/1562;}
+  .invest-carousel{position:relative;width:100%;aspect-ratio:2419/1562;}
+  .invest-carousel .media{position:absolute;inset:0;opacity:0;transition:opacity 300ms ease;}
+  .invest-carousel .media.show{opacity:1;}
+  @media (prefers-reduced-motion:reduce){
+    .invest-carousel .media{transition:none;}
+  }
   #s12-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
   .s12-line{stroke:var(--accent);stroke-width:1.5;fill:none;}
   #s12-arrowhead path{fill:var(--accent);stroke:none;}
@@ -1040,6 +1045,31 @@
   .slide.s13new .browser-frame{max-width:min(100%,883px);}
   .slide.s13new .reveal-list{margin-top:2.4rem;}
   .slide.s13new .rl-d{max-width:none;}
+  #s13-screen-zone{flex-direction:column;gap:1.4rem;}
+  .carousel-nav{display:flex;align-items:center;justify-content:center;gap:1.1rem;}
+  .carousel-arrow{
+    width:2.3rem;height:2.3rem;
+    border-radius:50%;
+    background:#fff;
+    border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    color:var(--ink);
+    font-size:0.85rem;
+    box-shadow:0 6px 16px rgba(20,20,20,0.08);
+    transition:transform 200ms ease, box-shadow 200ms ease;
+  }
+  .carousel-arrow:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(20,20,20,0.14);}
+  .carousel-dots{display:flex;align-items:center;gap:0.5rem;}
+  .carousel-dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--line);
+    border:none;padding:0;cursor:pointer;
+    transition:all 200ms ease;
+  }
+  .carousel-dot.current{width:20px;border-radius:4px;background:var(--accent);}
+  .carousel-dot:hover{background:var(--ink);}
+  .carousel-dot.current:hover{background:var(--accent);}
 
   /* ---------- annotated screen zone (slides 12 & 13) ---------- */
   .annotate-screen-zone{width:100%;position:relative;display:flex;align-items:center;justify-content:center;}
@@ -1519,8 +1549,23 @@
           <div class="browser-frame" style="width:100%;">
             <div class="browser-bar"><span class="b-dot"></span><span class="b-dot"></span><span class="b-dot"></span><div class="b-field"></div></div>
             <div class="s12-screen-wrap">
-              <div class="media" id="s13-screen" data-src="assets/new invest flow.gif" data-label="new invest flow.gif — Redesigned invest flow"></div>
+              <div class="invest-carousel" id="s13-carousel">
+                <div class="media show" data-src="assets/new invest flow 1.png" data-label="new invest flow 1.png" role="img" aria-label="Redesigned invest flow, step 1"></div>
+                <div class="media" data-src="assets/new invest flow 2.png" data-label="new invest flow 2.png" role="img" aria-label="Redesigned invest flow, step 2"></div>
+                <div class="media" data-src="assets/new invest flow 3.png" data-label="new invest flow 3.png" role="img" aria-label="Redesigned invest flow, step 3"></div>
+                <div class="media" data-src="assets/new invest flow 4.png" data-label="new invest flow 4.png" role="img" aria-label="Redesigned invest flow, step 4"></div>
+              </div>
             </div>
+          </div>
+          <div class="carousel-nav">
+            <button class="carousel-arrow" id="s13-prev" aria-label="Previous screen">←</button>
+            <div class="carousel-dots" id="s13-dots">
+              <button class="carousel-dot current" data-i="0" aria-label="Screen 1"></button>
+              <button class="carousel-dot" data-i="1" aria-label="Screen 2"></button>
+              <button class="carousel-dot" data-i="2" aria-label="Screen 3"></button>
+              <button class="carousel-dot" data-i="3" aria-label="Screen 4"></button>
+            </div>
+            <button class="carousel-arrow" id="s13-next" aria-label="Next screen">→</button>
           </div>
         </div>
       </div>
@@ -2117,7 +2162,32 @@
   }
   function resetSlide13(){
     renderSlide13(0);
+    setS13Carousel(0);
   }
+
+  /* independent carousel on the same slide: manual prev/next + dots,
+     not tied to the reveal-list beats above */
+  var s13CarouselIndex = 0;
+  function setS13Carousel(i){
+    s13CarouselIndex = i;
+    document.querySelectorAll('#s13-carousel .media').forEach(function(shot, idx){
+      shot.classList.toggle('show', idx === i);
+    });
+    document.querySelectorAll('#s13-dots .carousel-dot').forEach(function(dot, idx){
+      dot.classList.toggle('current', idx === i);
+    });
+  }
+  document.getElementById('s13-prev').addEventListener('click', function(){
+    setS13Carousel((s13CarouselIndex + 3) % 4);
+  });
+  document.getElementById('s13-next').addEventListener('click', function(){
+    setS13Carousel((s13CarouselIndex + 1) % 4);
+  });
+  document.querySelectorAll('#s13-dots .carousel-dot').forEach(function(dot){
+    dot.addEventListener('click', function(){
+      setS13Carousel(parseInt(dot.dataset.i, 10));
+    });
+  });
 
   /* ---------------- slide entry dispatcher ---------------- */
   function onSlideEnter(idx){
