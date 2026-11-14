@@ -981,54 +981,40 @@
   /* ---------- Slide: usability research ---------- */
   .slide.sresearch .slide-body{max-width:none;width:700px;position:relative;z-index:2;}
   .slide.sresearch .headline{max-width:none;}
-  .research-sub{margin-top:0.85rem;}
   .quote-grid{
     display:grid;
     grid-template-columns:repeat(2,1fr);
     grid-template-rows:repeat(2,1fr);
-    gap:1.25rem;
-    margin-top:2.5rem;
+    gap:1.5rem;
+    margin-top:3rem;
   }
   .quote-card{
     position:relative;
     background:#fff;
     border:1px solid var(--line);
-    border-radius:10px;
-    padding:2.3rem 1.25rem 1.3rem;
+    border-radius:16px;
+    border-top-left-radius:6px;
+    padding:3.4rem 1.4rem 1.5rem;
     margin:0;
     display:flex;
     flex-direction:column;
+    box-shadow:0 14px 32px rgba(20,20,20,0.06);
   }
   .quote-card.standout{border-color:var(--accent);}
-  .quote-tag-row{display:flex;align-items:center;gap:0.65rem;flex-wrap:wrap;}
-  .quote-tag{
-    font-size:0.66rem;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    color:var(--accent);
-  }
-  .quote-standout{
-    font-size:0.6rem;
-    letter-spacing:0.07em;
-    text-transform:uppercase;
-    color:var(--accent);
-    border-left:1px solid var(--line);
-    padding-left:0.6rem;
-  }
-  .quote-card blockquote{margin:0.6rem 0 0;}
+  .quote-card blockquote{margin:0;}
   .quote-card blockquote p{
     margin:0;
     font-family:'Inter',sans-serif;
-    font-size:1.02rem;
-    line-height:1.5;
+    font-size:1.12rem;
+    line-height:1.6;
     color:var(--ink);
   }
   .quote-badge{
     position:absolute;
-    top:-1.15rem;
-    left:1.1rem;
-    width:3.3rem;
-    height:3.3rem;
+    top:-1.5rem;
+    left:-0.6rem;
+    width:4.4rem;
+    height:4.4rem;
     border-radius:50%;
     background:#fff;
     border:1px solid var(--line);
@@ -1036,9 +1022,10 @@
     align-items:center;
     justify-content:center;
     font-family:'Marcellus',serif;
-    font-size:2rem;
+    font-size:2.7rem;
     color:var(--accent);
     line-height:1;
+    box-shadow:0 10px 24px rgba(20,20,20,0.1);
   }
   .quote-card.standout .quote-badge{border-color:var(--accent);}
   .research-panel{
@@ -1403,36 +1390,22 @@
             data-headline="Would self-serve users find value in it? We tested it with them to find out.">
     <div class="slide-body">
       <h1 class="headline">Would self-serve users find value in it? We tested it with them to find out.</h1>
-      <p class="caption research-sub">[X] self-serve users &middot; unguided sessions on laptops</p>
       <div class="quote-grid">
         <figure class="quote-card">
           <span class="quote-badge" aria-hidden="true">&ldquo;</span>
-          <div class="quote-tag-row">
-            <div class="quote-tag mono">The app is still home</div>
-          </div>
-          <blockquote><p>"For everyday stuff I'll still use the app. That's where I invest."</p></blockquote>
+          <blockquote><p>For everyday stuff I'll still use the app. That's where I invest.</p></blockquote>
         </figure>
         <figure class="quote-card">
           <span class="quote-badge" aria-hidden="true">&ldquo;</span>
-          <div class="quote-tag-row">
-            <div class="quote-tag mono">No reason to visit before</div>
-          </div>
-          <blockquote><p>"I never really had a reason to open the website. This actually shows me things the app doesn't."</p></blockquote>
+          <blockquote><p>I never really had a reason to open the website. This actually shows me things the app doesn't.</p></blockquote>
         </figure>
         <figure class="quote-card">
           <span class="quote-badge" aria-hidden="true">&ldquo;</span>
-          <div class="quote-tag-row">
-            <div class="quote-tag mono">Bring it to mobile</div>
-          </div>
-          <blockquote><p>"Can you put this in the app too? I'd want to see it on my phone."</p></blockquote>
+          <blockquote><p>Can you put this in the app too? I'd want to see it on my phone.</p></blockquote>
         </figure>
         <figure class="quote-card standout">
           <span class="quote-badge" aria-hidden="true">&ldquo;</span>
-          <div class="quote-tag-row">
-            <div class="quote-tag mono">Benchmarking</div>
-            <span class="quote-standout mono">Standout</span>
-          </div>
-          <blockquote><p>"Seeing how I'm doing against the Nifty 50 is what I'd come back for."</p></blockquote>
+          <blockquote><p>Seeing how I'm doing against the Nifty 50 is what I'd come back for.</p></blockquote>
         </figure>
       </div>
     </div>
