@@ -211,96 +211,20 @@
   }
   #hint.hidden{opacity:0;}
 
-  /* ---------- dot navigation ---------- */
-  #dotnav{
+  /* ---------- progress bar ---------- */
+  .progress-track{
     position:fixed;
-    bottom:38px;
-    left:0;right:0;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:0.5rem;
-    z-index:30;
-  }
-  .dot-group{display:flex;align-items:center;gap:0.5rem;position:relative;}
-  .dot-group + .dot-group{margin-left:1.25rem;}
-  .dot-group-label{
-    position:absolute;
-    bottom:100%;
-    left:0;
-    margin-bottom:0.6rem;
-    font-family:'Spline Sans Mono',monospace;
-    font-size:0.65rem;
-    color:var(--muted);
-    white-space:nowrap;
-    opacity:0;
-    transition:opacity 150ms ease;
-    pointer-events:none;
-  }
-  .dot-group:hover .dot-group-label{opacity:1;}
-
-  .dot-wrap{position:relative;display:flex;align-items:center;justify-content:center;padding:0.5rem 0.15rem;cursor:pointer;}
-  .dot{
-    width:7px;height:7px;border-radius:50%;
+    top:0;left:0;right:0;
+    height:4px;
     background:var(--line);
-    transition:all 200ms ease;
+    z-index:50;
   }
-  .dot-wrap.current .dot{
-    width:20px;border-radius:4px;
+  .progress-fill{
+    height:100%;
+    width:0%;
     background:var(--accent);
+    transition:width 400ms ease;
   }
-  .dot-wrap:hover .dot{background:var(--ink);}
-  .dot-wrap.current:hover .dot{background:var(--accent);}
-
-  .dot-tip{
-    position:absolute;
-    bottom:100%;
-    left:50%;
-    transform:translateX(-50%) translateY(-6px);
-    margin-bottom:0.45rem;
-    max-width:17rem;
-    padding:0.35rem 0.75rem;
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:999px;
-    box-shadow:0 8px 24px rgba(20,20,20,0.10);
-    font-family:'Inter',sans-serif;
-    font-size:0.72rem;
-    color:var(--ink);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity 150ms ease, transform 150ms ease;
-    z-index:40;
-  }
-  .dot-wrap:hover .dot-tip{
-    opacity:1;
-    transform:translateX(-50%) translateY(0);
-  }
-  .dot-group:has(.dot-wrap:hover) .dot-group-label{opacity:0;}
-
-  @media (hover:none){
-    .dot-tip{display:none;}
-  }
-
-  /* ---------- contents button ---------- */
-  #contents-btn{
-    position:fixed;
-    bottom:38px;
-    left:60px;
-    font-family:'Spline Sans Mono',monospace;
-    font-size:0.78rem;
-    color:var(--ink);
-    background:none;
-    border:none;
-    cursor:pointer;
-    letter-spacing:0.02em;
-    z-index:30;
-    padding:0.5rem 0;
-  }
-  #contents-btn:hover{color:var(--accent);}
 
   /* ---------- footer strip ---------- */
   #footer-strip{
@@ -315,21 +239,10 @@
     line-height:1.5;
   }
 
-  /* ---------- bottom chrome: dot capsule + corner arrows ---------- */
-  #footer-strip,
-  #contents-btn{display:none;}
+  /* ---------- bottom chrome: corner arrows ---------- */
+  #footer-strip{display:none;}
   body.s3-active #hint{display:none;}
 
-  .dot-capsule{
-    display:flex;align-items:center;gap:0.5rem;
-    padding:0.5rem 1.15rem;
-    border-radius:999px;
-    background:rgba(250,250,247,0.72);
-    border:1px solid var(--line);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-    box-shadow:0 6px 22px rgba(20,20,20,0.07);
-  }
   #nav-arrows{
     display:flex;
     gap:0.65rem;
@@ -416,38 +329,6 @@
     text-transform:uppercase;
   }
   body.reduced-motion .sg-dot{animation:none;}
-
-  /* ---------- contents overlay ---------- */
-  #contents-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(250,250,247,0.97);
-    z-index:100;
-    display:none;
-    overflow-y:auto;
-    padding:95px 60px;
-  }
-  #contents-overlay.open{display:block;}
-  #contents-overlay .close-x{
-    position:fixed;
-    top:47px;right:60px;
-    font-family:'Spline Sans Mono',monospace;
-    font-size:1.4rem;
-    background:none;border:none;cursor:pointer;color:var(--ink);
-  }
-  #contents-overlay .close-x:hover{color:var(--accent);}
-  #toc-list{max-width:44rem;margin:0 auto;}
-  .toc-item{
-    display:flex;
-    gap:1.25rem;
-    padding:0.85rem 0;
-    border-bottom:1px solid var(--line);
-    cursor:pointer;
-    align-items:baseline;
-  }
-  .toc-item:hover .toc-headline{color:var(--accent);}
-  .toc-num{font-family:'Spline Sans Mono',monospace;color:var(--muted);font-size:0.85rem;flex-shrink:0;width:2rem;}
-  .toc-headline{font-family:'Archivo',sans-serif;font-weight:600;font-size:1.1rem;transition:color 150ms ease;}
 
   /* ---------- Slide 1 ---------- */
   .slide.s1 .slide-body{max-width:none;width:75%;}
@@ -1097,6 +978,92 @@
     .s9-first,.imbalance-takeaway{transition:none;}
   }
 
+  /* ---------- Slide: usability research ---------- */
+  .slide.sresearch .slide-body{max-width:none;width:100%;}
+  .slide.sresearch .headline{max-width:50rem;}
+  .research-sub{margin-top:0.85rem;}
+  .research-row{
+    display:flex;
+    flex-direction:row;
+    align-items:stretch;
+    gap:3rem;
+    margin-top:2.75rem;
+    flex:1;
+    min-height:0;
+  }
+  .quote-grid{
+    flex:0 0 54%;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    grid-template-rows:repeat(2,1fr);
+    gap:1.25rem;
+  }
+  .quote-card{
+    position:relative;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:1.6rem 1.25rem 1.3rem;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+  }
+  .quote-card.standout{border-color:var(--accent);}
+  .quote-tag-row{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;}
+  .quote-tag{
+    font-size:0.66rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+  .quote-standout{
+    font-size:0.6rem;
+    letter-spacing:0.07em;
+    text-transform:uppercase;
+    color:#fff;
+    background:var(--accent);
+    padding:0.15rem 0.5rem;
+    border-radius:999px;
+  }
+  .quote-card blockquote{margin:0.85rem 0 0;}
+  .quote-card blockquote p{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    font-size:1.02rem;
+    line-height:1.5;
+    color:var(--ink);
+  }
+  .quote-badge{
+    position:absolute;
+    top:-1rem;
+    left:1.15rem;
+    width:2.2rem;
+    height:2.2rem;
+    border-radius:50%;
+    background:#fff;
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Marcellus',serif;
+    font-size:1.3rem;
+    color:var(--accent);
+    line-height:1;
+  }
+  .quote-card.standout .quote-badge{border-color:var(--accent);}
+  .research-shots{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:1.25rem;
+  }
+  .research-shots .media{
+    flex:1;
+    min-height:0;
+    border-radius:10px;
+  }
+
   /* ---------- Slide 9: invest flow annotations ---------- */
   .slide.s12inv{justify-content:flex-start;padding-top:114px;}
   .slide.s12inv .slide-body.split{align-items:stretch;}
@@ -1435,8 +1402,54 @@
     </div>
   </section>
 
+  <!-- Slide: usability research -->
+  <section class="slide sresearch" data-type="content" data-dot="10"
+            data-headline="Would self-serve users find value in it? We tested it with them to find out.">
+    <div class="slide-body">
+      <h1 class="headline">Would self-serve users find value in it? We tested it with them to find out.</h1>
+      <p class="caption research-sub">[X] self-serve users &middot; unguided sessions on laptops</p>
+      <div class="research-row">
+        <div class="quote-grid">
+          <figure class="quote-card">
+            <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+            <div class="quote-tag-row">
+              <div class="quote-tag mono">The app is still home</div>
+            </div>
+            <blockquote><p>"For everyday stuff I'll still use the app. That's where I invest."</p></blockquote>
+          </figure>
+          <figure class="quote-card">
+            <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+            <div class="quote-tag-row">
+              <div class="quote-tag mono">No reason to visit before</div>
+            </div>
+            <blockquote><p>"I never really had a reason to open the website. This actually shows me things the app doesn't."</p></blockquote>
+          </figure>
+          <figure class="quote-card">
+            <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+            <div class="quote-tag-row">
+              <div class="quote-tag mono">Bring it to mobile</div>
+            </div>
+            <blockquote><p>"Can you put this in the app too? I'd want to see it on my phone."</p></blockquote>
+          </figure>
+          <figure class="quote-card standout">
+            <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+            <div class="quote-tag-row">
+              <div class="quote-tag mono">Benchmarking</div>
+              <span class="quote-standout mono">Standout</span>
+            </div>
+            <blockquote><p>"Seeing how I'm doing against the Nifty 50 is what I'd come back for."</p></blockquote>
+          </figure>
+        </div>
+        <div class="research-shots">
+          <div class="media" data-src="assets/research-1.png" data-label="research-1.png" role="img" aria-label="Usability session with a self-serve user"></div>
+          <div class="media" data-src="assets/research-2.png" data-label="research-2.png" role="img" aria-label="Usability session with a self-serve user"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Slide 7 -->
-  <section class="slide s10u" data-type="content" data-dot="10" data-advance-stages="1"
+  <section class="slide s10u" data-type="content" data-dot="11" data-advance-stages="1"
             data-headline="Scripbox decided to bring the client portal to everyone.">
     <div class="slide-body">
       <h1 class="headline">Scripbox decided to bring the client portal to everyone.</h1>
@@ -1461,7 +1474,7 @@
   </section>
 
   <!-- Slide 8 -->
-  <section class="slide s11gap" data-type="content" data-dot="11"
+  <section class="slide s11gap" data-type="content" data-dot="12"
             data-headline="Opening the portal to everyone meant closing a gap first: transactions.">
     <div class="slide-body split">
       <div class="split-text">
@@ -1484,7 +1497,7 @@
   </section>
 
   <!-- Slide 9 -->
-  <section class="slide s12inv" data-type="content" data-dot="12" data-advance-stages="4"
+  <section class="slide s12inv" data-type="content" data-dot="13" data-advance-stages="4"
             data-headline="75%+ of users dropped off at the first step of the old invest flow.">
     <div class="slide-body split">
       <div class="split-text">
@@ -1535,7 +1548,7 @@
   </section>
 
   <!-- Slide 10 -->
-  <section class="slide s12inv s13new" data-type="content" data-dot="13" data-advance-stages="3"
+  <section class="slide s12inv s13new" data-type="content" data-dot="14" data-advance-stages="3"
             data-headline="We redesigned the invest flow around four key principles.">
     <div class="slide-body split">
       <div class="split-text">
@@ -1578,7 +1591,7 @@
   </section>
 
   <!-- Slide 14: summary -->
-  <section class="slide ssum" data-type="content" data-dot="14"
+  <section class="slide ssum" data-type="content" data-dot="15"
             data-headline="How we transformed the desktop experience">
     <div class="slide-body">
       <h1 class="headline large">How we transformed the desktop experience</h1>
@@ -1613,8 +1626,8 @@
     </div>
   </section>
 
-  <!-- Slide 15: the partnership -->
-  <section class="slide closing-frame" data-type="content" data-dot="15"
+  <!-- Slide 16: the partnership -->
+  <section class="slide closing-frame" data-type="content" data-dot="16"
             data-headline="The partnership grew">
     <p class="mono" style="color:var(--muted);margin-bottom:1rem;">Scripbox × Parallel</p>
     <h1 class="headline">The partnership grew</h1>
@@ -1628,8 +1641,11 @@
 
 </div>
 
+<!-- Progress bar -->
+<div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
 <!-- Persistent hint -->
-<div id="hint" class="mono">→ to begin · C for contents</div>
+<div id="hint" class="mono">→ to begin</div>
 
 <!-- Page number -->
 <div id="page-num" class="mono"></div>
@@ -1637,16 +1653,10 @@
 <!-- Name tag -->
 <div id="name-tag" class="mono">Sushma Bhandari</div>
 
-<!-- Dot navigation -->
-<nav id="dotnav" aria-label="Slide navigation"></nav>
-
-<!-- Contents button -->
-<button id="contents-btn">Contents</button>
-
 <!-- Footer strip -->
 <div id="footer-strip">
   <div>Sushma Bhandari · Scripbox × Parallel</div>
-  <div class="mono" id="footer-counter">01 / 15</div>
+  <div class="mono" id="footer-counter">01 / 16</div>
 </div>
 
 <!-- Corner arrows -->
@@ -1659,12 +1669,6 @@
 <div id="swipe-guide" aria-hidden="true">
   <div class="sg-track"><div class="sg-dot"></div></div>
   <div class="sg-label mono">Swipe to navigate</div>
-</div>
-
-<!-- Contents overlay -->
-<div id="contents-overlay" role="dialog" aria-modal="true">
-  <button class="close-x" id="contents-close">×</button>
-  <div id="toc-list"></div>
 </div>
 
 </div><!-- /stage -->
@@ -1782,83 +1786,10 @@
     return target ? target.index : null;
   }
 
-  /* ---------------- dot nav build ---------------- */
-  var dotnav = document.getElementById('dotnav');
-  var dotCapsule = document.createElement('div');
-  dotCapsule.className = 'dot-capsule';
-  var dotGroups = [];
-  slides.forEach(function(s){
-    if(s.type === 'interstitial'){
-      var titleEl = s.el.querySelector('h2');
-      dotGroups.push({label: titleEl ? titleEl.textContent : '', slides: [], breakSlide: s});
-    } else if(s.type === 'content'){
-      if(!dotGroups.length) dotGroups.push({label:'', slides:[]});
-      dotGroups[dotGroups.length - 1].slides.push(s);
-    }
-  });
-  dotGroups.forEach(function(g){
-    if(!g.slides.length) return;
-    var group = document.createElement('div');
-    group.className = 'dot-group';
-    if(g.label){
-      var label = document.createElement('div');
-      label.className = 'dot-group-label mono';
-      label.textContent = g.label;
-      group.appendChild(label);
-    }
-    g.slides.forEach(function(slideForDot, di){
-      var n = slideForDot.dot;
-      var firstOfGroup = di === 0 && g.breakSlide;
-      var wrap = document.createElement('div');
-      wrap.className = 'dot-wrap';
-      wrap.dataset.dot = n;
-      var dot = document.createElement('div');
-      dot.className = 'dot';
-      wrap.appendChild(dot);
-
-      var tip = document.createElement('div');
-      tip.className = 'dot-tip';
-      tip.textContent = slideForDot.headline;
-      wrap.appendChild(tip);
-
-      wrap.addEventListener('click', function(){
-        if(firstOfGroup){ setCurrent(g.breakSlide.index, 0); }
-        else { goToDot(n); }
-      });
-      group.appendChild(wrap);
-    });
-    dotCapsule.appendChild(group);
-  });
-  dotnav.appendChild(dotCapsule);
-
-  function goToDot(n){
-    var target = slides.find(function(s){ return s.dot === n; });
-    if(target){ setCurrent(target.index, 0); }
-  }
-
-  function updateDots(){
-    var activeDot = getActiveDotForIndex(current);
-    dotnav.querySelectorAll('.dot-wrap').forEach(function(w){
-      var n = parseInt(w.dataset.dot, 10);
-      w.classList.toggle('current', n === activeDot);
-    });
-  }
-
-  function getActiveDotForIndex(idx){
-    var s = slides[idx];
-    if(s.type === 'content') return s.dot;
-    if(s.type === 'interstitial'){
-      for(var i = idx + 1; i < slides.length; i++){
-        if(slides[i].type === 'content') return slides[i].dot;
-      }
-    }
-    return null;
-  }
-
-  /* ---------------- footer ---------------- */
+  /* ---------------- progress + footer ---------------- */
+  var progressFill = document.getElementById('progress-fill');
   function updateChrome(){
     var s = slides[current];
-    var activeDot = getActiveDotForIndex(current);
     var footerCounter = document.getElementById('footer-counter');
     var pageNum = document.getElementById('page-num');
     var total = String(contentSlides.length).padStart(2,'0');
@@ -1875,30 +1806,8 @@
     document.body.classList.toggle('break-active', s.type !== 'content');
     document.body.classList.toggle('dark-break', s.type === 'interstitial');
     document.documentElement.classList.toggle('dark-break', s.type === 'interstitial');
-    updateDots();
+    progressFill.style.width = ((current + 1) / slides.length * 100) + '%';
   }
-
-  /* ---------------- contents overlay ---------------- */
-  var tocList = document.getElementById('toc-list');
-  contentSlides.forEach(function(s){
-    var item = document.createElement('div');
-    item.className = 'toc-item';
-    item.innerHTML = '<span class="toc-num mono">' + String(s.dot).padStart(2,'0') + '</span><span class="toc-headline">' + s.headline + '</span>';
-    item.addEventListener('click', function(){
-      setCurrent(s.index, 0);
-      closeOverlay();
-    });
-    tocList.appendChild(item);
-  });
-
-  var overlay = document.getElementById('contents-overlay');
-  function openOverlay(){ overlay.classList.add('open'); }
-  function closeOverlay(){ overlay.classList.remove('open'); }
-  document.getElementById('contents-btn').addEventListener('click', openOverlay);
-  document.getElementById('contents-close').addEventListener('click', closeOverlay);
-  overlay.addEventListener('click', function(e){
-    if(e.target === overlay) closeOverlay();
-  });
 
   /* ---------------- hint ---------------- */
   var hintEl = document.getElementById('hint');
@@ -2286,9 +2195,9 @@
     if(s.dot === 7) resetSortSlide();
     if(s.dot === 8) resetNavSlide();
     if(s.dot === 9) renderSlide9(stage || 0);
-    if(s.dot === 10) resetUnifySlide();
-    if(s.dot === 12) resetSlide12();
-    if(s.dot === 13) resetSlide13();
+    if(s.dot === 11) resetUnifySlide();
+    if(s.dot === 13) resetSlide12();
+    if(s.dot === 14) resetSlide13();
   }
 
   /* ---------------- render / navigation ---------------- */
@@ -2329,11 +2238,11 @@
         setNavBeat(stage);
       } else if(s.dot === 9){
         renderSlide9(stage);
-      } else if(s.dot === 10){
+      } else if(s.dot === 11){
         if(stage === 1) setUnifyMerged(true);
-      } else if(s.dot === 12){
-        renderSlide12(stage);
       } else if(s.dot === 13){
+        renderSlide12(stage);
+      } else if(s.dot === 14){
         renderSlide13(stage);
       }
       return;
@@ -2351,9 +2260,9 @@
       if(s.dot === 7){ stage--; setSortBeat(stage); return; }
       if(s.dot === 8){ stage--; setNavBeat(stage); return; }
       if(s.dot === 9){ stage--; renderSlide9(stage); return; }
-      if(s.dot === 10){ stage--; setUnifyMerged(false); return; }
-      if(s.dot === 12){ stage--; renderSlide12(stage); return; }
-      if(s.dot === 13){ stage--; renderSlide13(stage); return; }
+      if(s.dot === 11){ stage--; setUnifyMerged(false); return; }
+      if(s.dot === 13){ stage--; renderSlide12(stage); return; }
+      if(s.dot === 14){ stage--; renderSlide13(stage); return; }
     }
     if(current > 0){
       setCurrent(current - 1, 0);
@@ -2383,7 +2292,6 @@
     var start = swipeStart;
     swipeStart = null;
     if(!start || e.touches.length) return;
-    if(overlay.classList.contains('open')) return;
     var vdx = e.changedTouches[0].clientX - start.x;
     var vdy = e.changedTouches[0].clientY - start.y;
     if(Math.hypot(vdx, vdy) < 48) return; /* too short: it is a tap */
@@ -2394,16 +2302,8 @@
 
   /* ---------------- keyboard ---------------- */
   document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape'){
-      if(overlay.classList.contains('open')) closeOverlay();
-      return;
-    }
-    if(overlay.classList.contains('open')) return;
     if(e.key === 'ArrowRight'){ e.preventDefault(); next(); }
     else if(e.key === 'ArrowLeft'){ e.preventDefault(); prev(); }
-    else if(e.key === 'c' || e.key === 'C'){
-      if(overlay.classList.contains('open')) closeOverlay(); else openOverlay();
-    }
   });
 
   /* ---------------- init ---------------- */
