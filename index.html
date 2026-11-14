@@ -170,30 +170,6 @@
   .closing-frame a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent);}
   .closing-frame .closing-sub{margin:1.5rem auto 0;color:var(--muted);}
 
-  /* ---------- page number ---------- */
-  #page-num{
-    position:fixed;
-    top:57px;
-    left:60px;
-    font-family:'Spline Sans Mono',monospace;
-    font-size:0.8rem;
-    letter-spacing:0.04em;
-    color:var(--muted);
-    z-index:20;
-  }
-
-  #name-tag{
-    position:fixed;
-    top:57px;
-    right:60px;
-    font-family:'Spline Sans Mono',monospace;
-    font-size:0.8rem;
-    letter-spacing:0.04em;
-    color:var(--muted);
-    z-index:20;
-  }
-  body.break-active #name-tag{display:none;}
-
   /* ---------- keyboard hint ---------- */
   #hint{
     position:fixed;
@@ -1613,12 +1589,6 @@
 <!-- Persistent hint -->
 <div id="hint" class="mono">→ to begin</div>
 
-<!-- Page number -->
-<div id="page-num" class="mono"></div>
-
-<!-- Name tag -->
-<div id="name-tag" class="mono">Sushma Bhandari</div>
-
 <!-- Footer strip -->
 <div id="footer-strip">
   <div>Sushma Bhandari · Scripbox × Parallel</div>
@@ -1757,17 +1727,13 @@
   function updateChrome(){
     var s = slides[current];
     var footerCounter = document.getElementById('footer-counter');
-    var pageNum = document.getElementById('page-num');
     var total = String(contentSlides.length).padStart(2,'0');
     if(s.type === 'content'){
       var num = String(s.dot).padStart(2,'0');
       footerCounter.style.display = '';
       footerCounter.textContent = num + ' / ' + total;
-      pageNum.textContent = num + ' / ' + total;
-      pageNum.style.display = '';
     } else {
       footerCounter.style.display = 'none';
-      pageNum.style.display = 'none';
     }
     document.body.classList.toggle('break-active', s.type !== 'content');
     document.body.classList.toggle('dark-break', s.type === 'interstitial');
