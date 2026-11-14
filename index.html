@@ -979,37 +979,28 @@
   }
 
   /* ---------- Slide: usability research ---------- */
-  .slide.sresearch .slide-body{max-width:none;width:100%;}
-  .slide.sresearch .headline{max-width:50rem;}
+  .slide.sresearch .slide-body{max-width:none;width:700px;position:relative;z-index:2;}
+  .slide.sresearch .headline{max-width:none;}
   .research-sub{margin-top:0.85rem;}
-  .research-row{
-    display:flex;
-    flex-direction:row;
-    align-items:stretch;
-    gap:3rem;
-    margin-top:2.75rem;
-    flex:1;
-    min-height:0;
-  }
   .quote-grid{
-    flex:0 0 54%;
     display:grid;
     grid-template-columns:repeat(2,1fr);
     grid-template-rows:repeat(2,1fr);
     gap:1.25rem;
+    margin-top:2.5rem;
   }
   .quote-card{
     position:relative;
     background:#fff;
     border:1px solid var(--line);
     border-radius:10px;
-    padding:1.6rem 1.25rem 1.3rem;
+    padding:2.3rem 1.25rem 1.3rem;
     margin:0;
     display:flex;
     flex-direction:column;
   }
   .quote-card.standout{border-color:var(--accent);}
-  .quote-tag-row{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;}
+  .quote-tag-row{display:flex;align-items:center;gap:0.65rem;flex-wrap:wrap;}
   .quote-tag{
     font-size:0.66rem;
     letter-spacing:0.06em;
@@ -1020,12 +1011,11 @@
     font-size:0.6rem;
     letter-spacing:0.07em;
     text-transform:uppercase;
-    color:#fff;
-    background:var(--accent);
-    padding:0.15rem 0.5rem;
-    border-radius:999px;
+    color:var(--accent);
+    border-left:1px solid var(--line);
+    padding-left:0.6rem;
   }
-  .quote-card blockquote{margin:0.85rem 0 0;}
+  .quote-card blockquote{margin:0.6rem 0 0;}
   .quote-card blockquote p{
     margin:0;
     font-family:'Inter',sans-serif;
@@ -1035,10 +1025,10 @@
   }
   .quote-badge{
     position:absolute;
-    top:-1rem;
-    left:1.15rem;
-    width:2.2rem;
-    height:2.2rem;
+    top:-1.15rem;
+    left:1.1rem;
+    width:3.3rem;
+    height:3.3rem;
     border-radius:50%;
     background:#fff;
     border:1px solid var(--line);
@@ -1046,23 +1036,28 @@
     align-items:center;
     justify-content:center;
     font-family:'Marcellus',serif;
-    font-size:1.3rem;
+    font-size:2rem;
     color:var(--accent);
     line-height:1;
   }
   .quote-card.standout .quote-badge{border-color:var(--accent);}
-  .research-shots{
-    flex:1;
-    min-width:0;
+  .research-panel{
+    position:absolute;
+    top:0;right:0;bottom:0;left:53%;
+    background:#F9EBDE;
+    z-index:1;
     display:flex;
     flex-direction:column;
-    gap:1.25rem;
+    justify-content:center;
+    gap:1.75rem;
+    padding:57px 45px;
   }
-  .research-shots .media{
-    flex:1;
-    min-height:0;
+  .research-panel .media{
+    width:100%;
     border-radius:10px;
   }
+  #research-shot-1{aspect-ratio:2000/976;}
+  #research-shot-2{aspect-ratio:2000/1171;}
 
   /* ---------- Slide 9: invest flow annotations ---------- */
   .slide.s12inv{justify-content:flex-start;padding-top:114px;}
@@ -1094,7 +1089,8 @@
   .acq-panel::before,
   .report-panel::before,
   .ia-panel::before,
-  .gap-panel::before{
+  .gap-panel::before,
+  .research-panel::before{
     content:"";
     position:absolute;
     top:-400px;right:-400px;bottom:-400px;left:0;
@@ -1408,43 +1404,41 @@
     <div class="slide-body">
       <h1 class="headline">Would self-serve users find value in it? We tested it with them to find out.</h1>
       <p class="caption research-sub">[X] self-serve users &middot; unguided sessions on laptops</p>
-      <div class="research-row">
-        <div class="quote-grid">
-          <figure class="quote-card">
-            <span class="quote-badge" aria-hidden="true">&ldquo;</span>
-            <div class="quote-tag-row">
-              <div class="quote-tag mono">The app is still home</div>
-            </div>
-            <blockquote><p>"For everyday stuff I'll still use the app. That's where I invest."</p></blockquote>
-          </figure>
-          <figure class="quote-card">
-            <span class="quote-badge" aria-hidden="true">&ldquo;</span>
-            <div class="quote-tag-row">
-              <div class="quote-tag mono">No reason to visit before</div>
-            </div>
-            <blockquote><p>"I never really had a reason to open the website. This actually shows me things the app doesn't."</p></blockquote>
-          </figure>
-          <figure class="quote-card">
-            <span class="quote-badge" aria-hidden="true">&ldquo;</span>
-            <div class="quote-tag-row">
-              <div class="quote-tag mono">Bring it to mobile</div>
-            </div>
-            <blockquote><p>"Can you put this in the app too? I'd want to see it on my phone."</p></blockquote>
-          </figure>
-          <figure class="quote-card standout">
-            <span class="quote-badge" aria-hidden="true">&ldquo;</span>
-            <div class="quote-tag-row">
-              <div class="quote-tag mono">Benchmarking</div>
-              <span class="quote-standout mono">Standout</span>
-            </div>
-            <blockquote><p>"Seeing how I'm doing against the Nifty 50 is what I'd come back for."</p></blockquote>
-          </figure>
-        </div>
-        <div class="research-shots">
-          <div class="media" data-src="assets/research-1.png" data-label="research-1.png" role="img" aria-label="Usability session with a self-serve user"></div>
-          <div class="media" data-src="assets/research-2.png" data-label="research-2.png" role="img" aria-label="Usability session with a self-serve user"></div>
-        </div>
+      <div class="quote-grid">
+        <figure class="quote-card">
+          <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+          <div class="quote-tag-row">
+            <div class="quote-tag mono">The app is still home</div>
+          </div>
+          <blockquote><p>"For everyday stuff I'll still use the app. That's where I invest."</p></blockquote>
+        </figure>
+        <figure class="quote-card">
+          <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+          <div class="quote-tag-row">
+            <div class="quote-tag mono">No reason to visit before</div>
+          </div>
+          <blockquote><p>"I never really had a reason to open the website. This actually shows me things the app doesn't."</p></blockquote>
+        </figure>
+        <figure class="quote-card">
+          <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+          <div class="quote-tag-row">
+            <div class="quote-tag mono">Bring it to mobile</div>
+          </div>
+          <blockquote><p>"Can you put this in the app too? I'd want to see it on my phone."</p></blockquote>
+        </figure>
+        <figure class="quote-card standout">
+          <span class="quote-badge" aria-hidden="true">&ldquo;</span>
+          <div class="quote-tag-row">
+            <div class="quote-tag mono">Benchmarking</div>
+            <span class="quote-standout mono">Standout</span>
+          </div>
+          <blockquote><p>"Seeing how I'm doing against the Nifty 50 is what I'd come back for."</p></blockquote>
+        </figure>
       </div>
+    </div>
+    <div class="research-panel">
+      <div class="media" id="research-shot-1" data-src="assets/research-1.png" data-label="research-1.png" role="img" aria-label="Usability session with a self-serve user"></div>
+      <div class="media" id="research-shot-2" data-src="assets/research-2.png" data-label="research-2.png" role="img" aria-label="Usability session with a self-serve user"></div>
     </div>
   </section>
 
